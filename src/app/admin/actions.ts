@@ -2,15 +2,16 @@
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
+import { cookies } from "next/headers";
 import { adminClient } from "@/lib/supabase/admin";
-import { createClient, getUser } from "@/lib/supabase/server";
+import { ADMIN_COOKIE, adminToken, isAuthedCookie, passwordMatches } from "@/lib/admin-auth";
 import { newSlug } from "@/lib/slug";
 import type { EventStatus, FormField, Orientation, TemplateElement } from "@/lib/types";
 
 async function requireUser() {
-  const user = await getUser();
-  if (!user) throw new Error("Tidak dibenarkan");
-  return user;
+  const store = await cookies();
+  const ok = await isAuthedCookie(store.get(ADMIN_COOKIE)?.value);
+  if (!ok) throw new Error("Tidak dibenarkan");
 }
 
 // ============ Majlis ============
@@ -21,7 +22,7 @@ const DEFAULT_FIELDS: FormField[] = [
 ];
 
 export async function createEvent(formData: FormData) {
-  const user = await requireUser();
+  await requireUser();
   const title = String(formData.get("title") || "").trim();
   if (!title) throw new Error("Nama majlis diperlukan");
   const db = adminClient();
@@ -33,7 +34,7 @@ export async function createEvent(formData: FormData) {
       event_date: String(formData.get("event_date") || "") || null,
       location: String(formData.get("location") || "").trim() || null,
       form_fields: DEFAULT_FIELDS,
-      created_by: user.id,
+      created_by: null,
     })
     .select("id")
     .single();
@@ -207,8 +208,26 @@ export async function deleteTemplate(id: string) {
 
 // ============ Sesi ============
 
+export async function loginAdmin(_prev: { error?: string } | null, formData: FormData) {
+  const password = String(formData.get("password") || "");
+  const next = String(formData.get("next") || "/admin");
+  if (!passwordMatches(password)) {
+    return { error: "Kata laluan tidak sah." };
+  }
+  const store = await cookies();
+  store.set(ADMIN_COOKIE, await adminToken(), {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "lax",
+    path: "/",
+    maxAge: 60 * 60 * 24 * 30, // 30 hari
+  });
+  // Elak open-redirect — hanya benarkan laluan dalaman /admin
+  redirect(next.startsWith("/admin") ? next : "/admin");
+}
+
 export async function signOut() {
-  const supabase = await createClient();
-  await supabase.auth.signOut();
+  const store = await cookies();
+  store.delete(ADMIN_COOKIE);
   redirect("/login");
 }

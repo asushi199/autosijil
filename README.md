@@ -8,8 +8,9 @@ Sistem web untuk merekod kehadiran majlis melalui QR code dan menjana sijil peny
 1. Pentadbir mencipta majlis → sistem menjana pautan awam + QR code.
 2. Peserta imbas QR dan mengisi borang kehadiran (medan borang boleh disesuaikan sepenuhnya).
 3. Selepas majlis, pentadbir menekan **Buka Muat Turun Sijil**.
-4. Peserta kembali ke pautan yang sama, masukkan **nama** atau **no. KP**, dan muat turun
-   sijil PDF masing-masing — dijana serta-merta, tiada fail disimpan di pelayan.
+4. Peserta kembali ke pautan yang sama, masukkan **nama penuh** (seperti diisi semasa
+   kehadiran), dan muat turun sijil PDF masing-masing — dijana serta-merta, tiada fail
+   disimpan di pelayan.
 5. Pentadbir boleh memuat turun semua sijil (1 PDF tergabung atau ZIP) dan eksport CSV kehadiran.
 
 Teknologi: Next.js (App Router) + Supabase (Postgres, Storage, Auth) + pdf-lib. Semua dalam
@@ -22,9 +23,7 @@ had percuma Vercel dan Supabase.
 1. Daftar di <https://supabase.com> → **New project** (pilih region Singapore).
 2. Selepas projek siap, buka **SQL Editor** → **New query** → tampal seluruh kandungan
    [`supabase/migration.sql`](supabase/migration.sql) → **Run**.
-3. Buka **Authentication → Users → Add user** → cipta akaun pentadbir
-   (e-mel + kata laluan; tandakan *Auto Confirm User*). Ulang untuk setiap pentadbir.
-4. Buka **Project Settings → API** dan salin tiga nilai:
+3. Buka **Project Settings → API** dan salin tiga nilai:
    - Project URL
    - `anon` public key
    - `service_role` key (**rahsia**)
@@ -34,11 +33,13 @@ had percuma Vercel dan Supabase.
 ```bash
 cp .env.local.example .env.local
 # isikan nilai Supabase ke dalam .env.local
+# serta tetapkan ADMIN_PASSWORD kepada kata laluan dikongsi pasukan
 npm install
 npm run dev
 ```
 
-Buka <http://localhost:3000> → log masuk dengan akaun pentadbir yang dicipta tadi.
+Buka <http://localhost:3000> → log masuk menggunakan `ADMIN_PASSWORD` yang anda tetapkan.
+Satu kata laluan sahaja dikongsi oleh pasukan — tiada akaun individu untuk diurus.
 
 ### 3. Deploy ke Vercel (percuma)
 

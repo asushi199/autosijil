@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
 import { adminClient } from "@/lib/supabase/admin";
-import { normalizeIc } from "@/lib/sijil-data";
 import { sijilToken } from "@/lib/token";
 import type { EventRow } from "@/lib/types";
 
@@ -25,46 +24,34 @@ export async function POST(req: NextRequest, ctx: { params: Promise<{ slug: stri
     return NextResponse.json({ error: "Permintaan tidak sah." }, { status: 400 });
   }
   const query = (body.query ?? "").trim();
-  if (query.length < 3) {
-    return NextResponse.json({ error: "Sila masukkan nama penuh atau no. KP." }, { status: 400 });
+  if (query.length < 2) {
+    return NextResponse.json({ error: "Sila masukkan nama penuh anda." }, { status: 400 });
   }
 
-  // Cuba padan IC dahulu (jika input kelihatan seperti nombor), kemudian nama penuh
-  const icQuery = normalizeIc(query);
-  const looksLikeIc = /^\d{6,}$/.test(icQuery);
-
-  let matches: { id: string; name_value: string }[] = [];
-  if (looksLikeIc) {
-    const { data } = await db
-      .from("attendees")
-      .select("id, name_value")
-      .eq("event_id", event.id)
-      .eq("ic_value", icQuery)
-      .limit(3);
-    matches = data ?? [];
-  }
-  if (!matches.length) {
-    const { data } = await db
-      .from("attendees")
-      .select("id, name_value")
-      .eq("event_id", event.id)
-      .ilike("name_value", query)
-      .limit(3);
-    matches = data ?? [];
-  }
+  // Padanan mengikut nama penuh (tidak sensitif huruf besar/kecil)
+  const { data } = await db
+    .from("attendees")
+    .select("id, name_value")
+    .eq("event_id", event.id)
+    .ilike("name_value", query)
+    .limit(3);
+  const matches = data ?? [];
 
   if (!matches.length) {
     return NextResponse.json(
       {
         error:
-          "Tiada rekod ditemui. Pastikan ejaan nama sama seperti yang diisi semasa kehadiran, atau cuba no. KP.",
+          "Tiada rekod ditemui. Pastikan ejaan nama sama seperti yang diisi semasa merekod kehadiran.",
       },
       { status: 404 },
     );
   }
   if (matches.length > 1) {
     return NextResponse.json(
-      { error: "Terdapat lebih daripada satu rekod dengan nama ini. Sila semak menggunakan no. KP." },
+      {
+        error:
+          "Terdapat lebih daripada satu rekod dengan nama yang sama. Sila hubungi urus setia majlis.",
+      },
       { status: 409 },
     );
   }

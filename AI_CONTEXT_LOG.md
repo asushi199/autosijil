@@ -2,6 +2,28 @@
 
 Log keputusan dan konteks penting untuk sesi AI akan datang. Tambah entri terbaru di atas.
 
+## 2026-07-08 — Auth kata laluan dikongsi & semak sijil ikut nama sahaja
+
+- **Keperluan pengguna**: (1) buang login Supabase yang leceh (hanya pasukan kecil guna);
+  (2) semak sijil guna nama sahaja — buang "atau IC" kerana IC tidak selalu dikumpul.
+- **Keputusan auth**: TIDAK buang login sepenuhnya (risiko dedah data peribadi peserta di URL
+  awam Vercel). Ganti Supabase Auth dengan **satu kata laluan dikongsi** (env `ADMIN_PASSWORD`)
+  — pengguna pilih opsyen ini.
+  - `src/lib/admin-auth.ts` (baharu, SELAMAT Edge — hanya Web Crypto `crypto.subtle`, tiada
+    import Node, tiada "server-only" supaya boleh diimport middleware). Kuki `admin_auth` =
+    HMAC(ADMIN_PASSWORD, secret); tukar kata laluan → kuki lama batal automatik.
+  - `src/proxy.ts` guna `isAuthedCookie` (bukan lagi sesi Supabase).
+  - `src/app/admin/actions.ts`: `requireUser()` kini semak kuki; tambah `loginAdmin(prev, fd)`
+    (useActionState) & `signOut()` (padam kuki); `createEvent` guna `created_by: null`.
+  - `src/app/login/page.tsx`: satu medan kata laluan sahaja.
+  - Fail lama dipadam: `src/lib/supabase/{client,server}.ts` (auth Supabase, kini yatim).
+    Tinggal `admin.ts` (service role) untuk semua akses DB.
+- **Semak sijil**: `SemakSijil.tsx` + `api/e/[slug]/semak/route.ts` kini padan nama sahaja
+  (`ilike`), buang cabang IC. Mesej berbilang-padanan → "hubungi urus setia".
+- **PENTING deploy**: tambah `ADMIN_PASSWORD` dalam env Vercel (selain kunci Supabase).
+- **Pengesahan**: build + lint lulus; logik token HMAC diuji (stabil, padanan kuki betul,
+  putaran kata laluan batalkan kuki lama).
+
 ## 2026-07-08 — Nama huruf besar & penggalan mengikut penyambung
 
 - **Keperluan pengguna**: (1) nama pada sijil sentiasa huruf besar tanpa mengira input;

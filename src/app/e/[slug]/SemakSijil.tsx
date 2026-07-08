@@ -44,14 +44,13 @@ export default function SemakSijil({ slug }: { slug: string }) {
         <div>
           <h2 className="font-medium">Semak &amp; Muat Turun Sijil</h2>
           <p className="mt-1 text-sm text-gray-500">
-            Masukkan <b>nama penuh</b> (seperti yang diisi semasa kehadiran) atau{" "}
-            <b>no. kad pengenalan</b>.
+            Masukkan <b>nama penuh</b> anda seperti yang diisi semasa merekod kehadiran.
           </p>
         </div>
         <form onSubmit={handleSubmit} className="flex gap-2">
           <input
             className="input"
-            placeholder="Nama penuh atau No. KP"
+            placeholder="Nama penuh"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             required
