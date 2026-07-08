@@ -1,36 +1,70 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Sistem e-Sijil & Kehadiran
 
-## Getting Started
+Sistem web untuk merekod kehadiran majlis melalui QR code dan menjana sijil penyertaan
+(PDF A4) secara automatik daripada templat yang boleh ditukar ganti.
 
-First, run the development server:
+**Aliran kerja:**
+
+1. Pentadbir mencipta majlis → sistem menjana pautan awam + QR code.
+2. Peserta imbas QR dan mengisi borang kehadiran (medan borang boleh disesuaikan sepenuhnya).
+3. Selepas majlis, pentadbir menekan **Buka Muat Turun Sijil**.
+4. Peserta kembali ke pautan yang sama, masukkan **nama** atau **no. KP**, dan muat turun
+   sijil PDF masing-masing — dijana serta-merta, tiada fail disimpan di pelayan.
+5. Pentadbir boleh memuat turun semua sijil (1 PDF tergabung atau ZIP) dan eksport CSV kehadiran.
+
+Teknologi: Next.js (App Router) + Supabase (Postgres, Storage, Auth) + pdf-lib. Semua dalam
+had percuma Vercel dan Supabase.
+
+## Persediaan (sekali sahaja)
+
+### 1. Cipta projek Supabase (percuma)
+
+1. Daftar di <https://supabase.com> → **New project** (pilih region Singapore).
+2. Selepas projek siap, buka **SQL Editor** → **New query** → tampal seluruh kandungan
+   [`supabase/migration.sql`](supabase/migration.sql) → **Run**.
+3. Buka **Authentication → Users → Add user** → cipta akaun pentadbir
+   (e-mel + kata laluan; tandakan *Auto Confirm User*). Ulang untuk setiap pentadbir.
+4. Buka **Project Settings → API** dan salin tiga nilai:
+   - Project URL
+   - `anon` public key
+   - `service_role` key (**rahsia**)
+
+### 2. Konfigurasi aplikasi
 
 ```bash
+cp .env.local.example .env.local
+# isikan nilai Supabase ke dalam .env.local
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Buka <http://localhost:3000> → log masuk dengan akaun pentadbir yang dicipta tadi.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### 3. Deploy ke Vercel (percuma)
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+1. Push repo ini ke GitHub.
+2. Di <https://vercel.com> → **Add New Project** → import repo → deploy.
+3. Dalam **Settings → Environment Variables**, masukkan semua pemboleh ubah dalam
+   `.env.local.example`, dengan `NEXT_PUBLIC_APP_URL` ditetapkan kepada URL Vercel anda
+   (cth. `https://esijil-ppd.vercel.app`).
+4. Redeploy. QR code kini menghala ke URL sebenar.
 
-## Learn More
+## Penggunaan
 
-To learn more about Next.js, take a look at the following resources:
+- **Templat Sijil**: reka latar sijil A4 dalam Canva/PowerPoint → eksport sebagai PNG/JPG →
+  muat naik dalam **Templat Sijil** → seret elemen teks (Nama Peserta, Nama Majlis, Tarikh,
+  Teks Statik) ke kedudukan yang dikehendaki → **Simpan** → **Pratonton PDF**.
+- **Majlis**: cipta majlis → sesuaikan medan borang (tandakan satu medan sebagai *Nama*;
+  medan *No. KP* adalah pilihan tetapi memudahkan semakan sijil) → pilih templat →
+  tekan **Buka Kehadiran** → edarkan QR.
+- **Status majlis**: Draf → Buka Kehadiran → Tutup Kehadiran → Buka Muat Turun Sijil.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Nota teknikal
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- Sijil dijana atas permintaan (on-demand) dengan `pdf-lib`; tiada PDF disimpan.
+- Fon sijil (Poppins, Playfair Display, Great Vibes — lesen OFL) dibenamkan sebagai base64
+  dalam `src/lib/fonts/`.
+- Kedudukan elemen templat disimpan sebagai pecahan (0–1) daripada saiz halaman supaya
+  padanan editor ↔ PDF adalah tepat.
+- Jadual pangkalan data dilindungi RLS; semua akses melalui route handler pelayan yang
+  membuat semakan kebenaran sendiri (kunci `service_role` tidak pernah sampai ke pelayar).
