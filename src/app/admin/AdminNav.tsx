@@ -103,16 +103,22 @@ export function AdminTabBar() {
             </Link>
           );
         })}
-        <form action={signOut} className="flex-1">
-          <button
-            type="submit"
-            className="flex w-full cursor-pointer flex-col items-center gap-1 py-2.5 text-[11px] font-medium text-gray-500 transition-colors active:text-red-700"
-          >
-            <LogoutIcon />
-            Log Keluar
-          </button>
-        </form>
       </div>
     </nav>
+  );
+}
+
+/** Butang log keluar untuk header (mudah alih). */
+export function AdminMobileLogout() {
+  return (
+    <form action={signOut} className="md:hidden">
+      <button
+        type="submit"
+        className="flex cursor-pointer items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-sm text-gray-500 transition-colors active:text-red-700"
+      >
+        <LogoutIcon />
+        Log Keluar
+      </button>
+    </form>
   );
 }

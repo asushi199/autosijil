@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { AdminHeaderNav, AdminTabBar } from "./AdminNav";
+import { AdminHeaderNav, AdminMobileLogout, AdminTabBar } from "./AdminNav";
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -10,6 +10,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             e-Sijil <span className="text-blue-700">&amp;</span> Kehadiran
           </Link>
           <AdminHeaderNav />
+          <AdminMobileLogout />
         </div>
       </header>
       <main className="mx-auto max-w-5xl px-4 py-6 pb-24 md:pb-6">{children}</main>
