@@ -43,7 +43,7 @@ export default function AttendanceForm({ slug, fields }: { slug: string; fields:
         <p className="font-medium">Terima kasih! Kehadiran anda telah direkodkan.</p>
         <p className="mt-2 text-sm text-gray-500">
           Sijil penyertaan boleh dimuat turun <b>di pautan yang sama</b> selepas dibuka oleh
-          urus setia majlis.
+          urus setia program.
         </p>
       </div>
     );

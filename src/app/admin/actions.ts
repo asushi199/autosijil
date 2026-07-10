@@ -14,7 +14,7 @@ async function requireUser() {
   if (!ok) throw new Error("Tidak dibenarkan");
 }
 
-// ============ Majlis ============
+// ============ Program ============
 
 const DEFAULT_FIELDS: FormField[] = [
   { key: "nama", label: "Nama Penuh", type: "text", required: true, role: "name" },
@@ -24,7 +24,7 @@ const DEFAULT_FIELDS: FormField[] = [
 export async function createEvent(formData: FormData) {
   await requireUser();
   const title = String(formData.get("title") || "").trim();
-  if (!title) throw new Error("Nama majlis diperlukan");
+  if (!title) throw new Error("Nama program diperlukan");
   const db = adminClient();
   const { data, error } = await db
     .from("events")
@@ -53,7 +53,7 @@ export interface UpdateEventPayload {
 
 export async function updateEvent(id: string, payload: UpdateEventPayload) {
   await requireUser();
-  if (!payload.title.trim()) return { error: "Nama majlis diperlukan" };
+  if (!payload.title.trim()) return { error: "Nama program diperlukan" };
   const nameFields = payload.form_fields.filter((f) => f.role === "name");
   if (nameFields.length !== 1) {
     return { error: "Tetapkan tepat satu medan sebagai 'Nama (dicetak pada sijil)'." };
@@ -92,6 +92,67 @@ export async function deleteAttendee(eventId: string, attendeeId: string) {
     .eq("event_id", eventId);
   if (error) throw new Error(error.message);
   revalidatePath(`/admin/events/${eventId}`);
+}
+
+/**
+ * Import senarai peserta secara pukal — satu nama satu baris.
+ * Digunakan apabila sijil perlu dijana tanpa peserta mengisi borang.
+ * Nama yang sudah wujud (tak sensitif huruf besar/kecil) dilangkau.
+ */
+export async function importAttendees(eventId: string, rawText: string) {
+  await requireUser();
+  const db = adminClient();
+  const { data: event } = await db
+    .from("events")
+    .select("id, form_fields")
+    .eq("id", eventId)
+    .single<{ id: string; form_fields: FormField[] }>();
+  if (!event) return { error: "Program tidak ditemui." };
+
+  const nameField = (event.form_fields ?? []).find((f) => f.role === "name");
+  if (!nameField) return { error: "Program ini tiada medan nama untuk sijil." };
+
+  const names = rawText
+    .split(/\r?\n/)
+    .map((s) => s.trim())
+    .filter(Boolean);
+  if (!names.length) return { error: "Tiada nama untuk diimport." };
+  if (names.length > 2000) return { error: "Terlalu banyak baris (maksimum 2000)." };
+  const tooLong = names.find((n) => n.length > 300);
+  if (tooLong) return { error: `Nama terlalu panjang: "${tooLong.slice(0, 40)}…"` };
+
+  // Buang pendua dalam input (tak sensitif huruf besar/kecil)
+  const seen = new Set<string>();
+  const unique: string[] = [];
+  for (const n of names) {
+    const key = n.toLowerCase();
+    if (!seen.has(key)) {
+      seen.add(key);
+      unique.push(n);
+    }
+  }
+
+  // Buang nama yang sudah wujud dalam program
+  const { data: existing } = await db
+    .from("attendees")
+    .select("name_value")
+    .eq("event_id", eventId);
+  const existingSet = new Set((existing ?? []).map((r) => r.name_value.toLowerCase()));
+  const toInsert = unique.filter((n) => !existingSet.has(n.toLowerCase()));
+
+  if (toInsert.length) {
+    const rows = toInsert.map((n) => ({
+      event_id: eventId,
+      data: { [nameField.key]: n },
+      name_value: n,
+      ic_value: null,
+    }));
+    const { error } = await db.from("attendees").insert(rows);
+    if (error) return { error: error.message };
+  }
+
+  revalidatePath(`/admin/events/${eventId}`);
+  return { added: toInsert.length, skipped: names.length - toInsert.length };
 }
 
 // ============ Templat ============

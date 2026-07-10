@@ -27,22 +27,22 @@ export default async function Dashboard() {
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <h1 className="text-xl font-semibold">Majlis</h1>
+        <h1 className="text-xl font-semibold">Program</h1>
         <Link href="/admin/events/new" className="btn-primary">
-          + Majlis Baharu
+          + Program Baharu
         </Link>
       </div>
 
       {!events?.length ? (
         <div className="card text-center text-gray-500 py-12">
-          Tiada majlis lagi. Klik <b>Majlis Baharu</b> untuk bermula.
+          Tiada program lagi. Klik <b>Program Baharu</b> untuk bermula.
         </div>
       ) : (
         <div className="card p-0 overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-gray-200 text-left text-gray-500">
-                <th className="px-4 py-3 font-medium">Majlis</th>
+                <th className="px-4 py-3 font-medium">Program</th>
                 <th className="px-4 py-3 font-medium">Tarikh</th>
                 <th className="px-4 py-3 font-medium">Status</th>
                 <th className="px-4 py-3 font-medium text-right">Kehadiran</th>

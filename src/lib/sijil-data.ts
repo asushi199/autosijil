@@ -3,10 +3,10 @@ import { adminClient } from "./supabase/admin";
 import { formatTarikh, type SijilValues } from "./pdf";
 import type { Attendee, EventRow, FormField, Template } from "./types";
 
-/** Muat majlis + templat + imej latar untuk penjanaan sijil. */
+/** Muat program + templat + imej latar untuk penjanaan sijil. */
 export async function loadSijilContext(event: EventRow) {
   const db = adminClient();
-  if (!event.template_id) return { error: "Majlis ini belum mempunyai templat sijil." };
+  if (!event.template_id) return { error: "Program ini belum mempunyai templat sijil." };
   const { data: template } = await db
     .from("templates")
     .select("*")

@@ -14,7 +14,7 @@ type Tab = {
 const TABS: Tab[] = [
   {
     href: "/admin",
-    label: "Majlis",
+    label: "Program",
     match: (p) => p === "/admin" || p.startsWith("/admin/events"),
     icon: (
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8}

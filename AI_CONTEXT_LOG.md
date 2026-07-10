@@ -2,6 +2,22 @@
 
 Log keputusan dan konteks penting untuk sesi AI akan datang. Tambah entri terbaru di atas.
 
+## 2026-07-10 — Import pukal senarai + tukar "Majlis" → "Program" + bar tab mudah alih
+
+- **Keperluan pengguna**: (1) kadangkala sijil perlu diberi tanpa peserta mengisi borang
+  pautan, jadi perlu import senarai nama sendiri (cara mudah); (2) tukar semua label UI
+  "Majlis" kepada "Program"; (3) reka bentuk mudah alih — nav atas admin jadi bar tab bawah.
+- **Import pukal**: `importAttendees(eventId, rawText)` dalam `actions.ts` — satu nama satu
+  baris, dipetakan ke medan `role: "name"`, `ic_value: null`. Buang pendua dalam input &
+  langkau nama yang sudah wujud (tak sensitif huruf besar/kecil); had 2000 baris.
+  UI: `src/app/admin/events/[id]/ImportPanel.tsx` (butang toggle + textarea) dalam seksyen
+  Kehadiran. **Tiada perubahan skema** — guna semula jadual `attendees` sedia ada.
+- **Rename**: hanya teks UI/komen "Majlis"/"majlis" → "Program"/"program". Jadual DB `events`
+  & pengecam kod kekal tidak berubah.
+- **Bar tab mudah alih**: `src/app/admin/AdminNav.tsx` — desktop kekal nav atas, mudah alih
+  dapat bar tab bawah tetap (Program/Templat/Log Keluar) dengan padding safe-area.
+- **Pengesahan**: build + lint lulus; halaman awam dirender bersih tanpa ralat konsol.
+
 ## 2026-07-08 — Auth kata laluan dikongsi & semak sijil ikut nama sahaja
 
 - **Keperluan pengguna**: (1) buang login Supabase yang leceh (hanya pasukan kecil guna);

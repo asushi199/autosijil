@@ -19,7 +19,7 @@ export async function GET(req: NextRequest, ctx: { params: Promise<{ slug: strin
     .select("*")
     .eq("slug", slug)
     .single<EventRow>();
-  if (!event) return NextResponse.json({ error: "Majlis tidak ditemui." }, { status: 404 });
+  if (!event) return NextResponse.json({ error: "Program tidak ditemui." }, { status: 404 });
   if (event.status !== "released") {
     return NextResponse.json({ error: "Sijil belum dibuka untuk muat turun." }, { status: 403 });
   }

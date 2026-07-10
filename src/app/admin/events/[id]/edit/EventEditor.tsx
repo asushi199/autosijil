@@ -81,16 +81,16 @@ export default function EventEditor({
   return (
     <div className="space-y-5">
       <div className="flex items-center justify-between">
-        <h1 className="text-xl font-semibold">Sunting Majlis</h1>
+        <h1 className="text-xl font-semibold">Sunting Program</h1>
         <Link href={`/admin/events/${event.id}`} className="text-sm text-blue-700 hover:underline">
-          ← Kembali ke halaman majlis
+          ← Kembali ke halaman program
         </Link>
       </div>
 
       <section className="card space-y-4">
-        <h2 className="font-medium">Maklumat Majlis</h2>
+        <h2 className="font-medium">Maklumat Program</h2>
         <div>
-          <label className="label">Nama majlis / program *</label>
+          <label className="label">Nama program *</label>
           <input className="input" value={title} onChange={(e) => setTitle(e.target.value)} />
         </div>
         <div>

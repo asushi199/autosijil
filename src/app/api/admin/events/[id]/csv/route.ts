@@ -11,7 +11,7 @@ export async function GET(_req: Request, ctx: { params: Promise<{ id: string }> 
   const { id } = await ctx.params;
   const db = adminClient();
   const { data: event } = await db.from("events").select("*").eq("id", id).single<EventRow>();
-  if (!event) return NextResponse.json({ error: "Majlis tidak ditemui." }, { status: 404 });
+  if (!event) return NextResponse.json({ error: "Program tidak ditemui." }, { status: 404 });
 
   const { data: attendees } = await db
     .from("attendees")

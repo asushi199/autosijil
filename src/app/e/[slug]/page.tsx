@@ -33,7 +33,7 @@ export default async function PublicEventPage({
   if (!event || event.status === "draft") {
     return (
       <Shell>
-        <div className="card text-center text-gray-600">Majlis tidak ditemui.</div>
+        <div className="card text-center text-gray-600">Program tidak ditemui.</div>
       </Shell>
     );
   }

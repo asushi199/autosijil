@@ -1,13 +1,13 @@
 # Sistem e-Sijil & Kehadiran
 
-Sistem web untuk merekod kehadiran majlis melalui QR code dan menjana sijil penyertaan
+Sistem web untuk merekod kehadiran program melalui QR code dan menjana sijil penyertaan
 (PDF A4) secara automatik daripada templat yang boleh ditukar ganti.
 
 **Aliran kerja:**
 
-1. Pentadbir mencipta majlis → sistem menjana pautan awam + QR code.
+1. Pentadbir mencipta program → sistem menjana pautan awam + QR code.
 2. Peserta imbas QR dan mengisi borang kehadiran (medan borang boleh disesuaikan sepenuhnya).
-3. Selepas majlis, pentadbir menekan **Buka Muat Turun Sijil**.
+3. Selepas program, pentadbir menekan **Buka Muat Turun Sijil**.
 4. Peserta kembali ke pautan yang sama, masukkan **nama penuh** (seperti diisi semasa
    kehadiran), dan muat turun sijil PDF masing-masing — dijana serta-merta, tiada fail
    disimpan di pelayan.
@@ -53,12 +53,12 @@ Satu kata laluan sahaja dikongsi oleh pasukan — tiada akaun individu untuk diu
 ## Penggunaan
 
 - **Templat Sijil**: reka latar sijil A4 dalam Canva/PowerPoint → eksport sebagai PNG/JPG →
-  muat naik dalam **Templat Sijil** → seret elemen teks (Nama Peserta, Nama Majlis, Tarikh,
+  muat naik dalam **Templat Sijil** → seret elemen teks (Nama Peserta, Nama Program, Tarikh,
   Teks Statik) ke kedudukan yang dikehendaki → **Simpan** → **Pratonton PDF**.
-- **Majlis**: cipta majlis → sesuaikan medan borang (tandakan satu medan sebagai *Nama*;
+- **Program**: cipta program → sesuaikan medan borang (tandakan satu medan sebagai *Nama*;
   medan *No. KP* adalah pilihan tetapi memudahkan semakan sijil) → pilih templat →
   tekan **Buka Kehadiran** → edarkan QR.
-- **Status majlis**: Draf → Buka Kehadiran → Tutup Kehadiran → Buka Muat Turun Sijil.
+- **Status program**: Draf → Buka Kehadiran → Tutup Kehadiran → Buka Muat Turun Sijil.
 
 ## Nota teknikal
 

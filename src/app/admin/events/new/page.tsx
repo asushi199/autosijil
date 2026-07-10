@@ -3,10 +3,10 @@ import { createEvent } from "../../actions";
 export default function NewEventPage() {
   return (
     <div className="mx-auto max-w-lg">
-      <h1 className="text-xl font-semibold mb-4">Majlis Baharu</h1>
+      <h1 className="text-xl font-semibold mb-4">Program Baharu</h1>
       <form action={createEvent} className="card space-y-4">
         <div>
-          <label className="label" htmlFor="title">Nama majlis / program *</label>
+          <label className="label" htmlFor="title">Nama program *</label>
           <input id="title" name="title" className="input" required
             placeholder="cth. Bengkel Pengurusan Data Sekolah 2026" />
         </div>
@@ -23,7 +23,7 @@ export default function NewEventPage() {
         <p className="text-xs text-gray-500">
           Selepas dicipta, anda boleh menyesuaikan medan borang kehadiran dan memilih templat sijil.
         </p>
-        <button type="submit" className="btn-primary w-full">Cipta Majlis</button>
+        <button type="submit" className="btn-primary w-full">Cipta Program</button>
       </form>
     </div>
   );

@@ -12,7 +12,7 @@ export async function POST(req: NextRequest, ctx: { params: Promise<{ slug: stri
     .eq("slug", slug)
     .single<Pick<EventRow, "id" | "status">>();
 
-  if (!event) return NextResponse.json({ error: "Majlis tidak ditemui." }, { status: 404 });
+  if (!event) return NextResponse.json({ error: "Program tidak ditemui." }, { status: 404 });
   if (event.status !== "released") {
     return NextResponse.json({ error: "Sijil belum dibuka untuk muat turun." }, { status: 403 });
   }
@@ -50,7 +50,7 @@ export async function POST(req: NextRequest, ctx: { params: Promise<{ slug: stri
     return NextResponse.json(
       {
         error:
-          "Terdapat lebih daripada satu rekod dengan nama yang sama. Sila hubungi urus setia majlis.",
+          "Terdapat lebih daripada satu rekod dengan nama yang sama. Sila hubungi urus setia program.",
       },
       { status: 409 },
     );

@@ -33,8 +33,8 @@ const FONT_CSS: Record<FontId, string> = {
 const SOURCE_LABEL: Record<ElementSource, string> = {
   name: "Nama Peserta",
   ic: "No. Kad Pengenalan",
-  event_name: "Nama Majlis",
-  event_date: "Tarikh Majlis",
+  event_name: "Nama Program",
+  event_date: "Tarikh Program",
   static: "Teks Statik",
 };
 
@@ -383,7 +383,7 @@ export default function TemplateEditor({ template }: { template: Template }) {
         <div className="space-y-4">
           <ol className="rounded-xl border border-blue-100 bg-blue-50/60 p-3 text-xs text-blue-900 space-y-1">
             <li><b>1.</b> Muat naik imej latar sijil (A4).</li>
-            <li><b>2.</b> Tambah elemen teks (Nama, Nama Majlis, Tarikh…).</li>
+            <li><b>2.</b> Tambah elemen teks (Nama, Nama Program, Tarikh…).</li>
             <li><b>3.</b> Seret ke tempatnya &amp; laraskan lebar kotak, fon, saiz.</li>
             <li><b>4.</b> <b>Simpan</b>, kemudian <b>Pratonton PDF</b>.</li>
           </ol>

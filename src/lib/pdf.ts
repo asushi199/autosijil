@@ -160,7 +160,7 @@ export async function generateCombinedSijil(
   return doc.save();
 }
 
-/** Format tarikh majlis kepada gaya Melayu, cth. "8 Julai 2026". */
+/** Format tarikh program kepada gaya Melayu, cth. "8 Julai 2026". */
 export function formatTarikh(dateStr: string | null): string {
   if (!dateStr) return "";
   const d = new Date(dateStr + "T00:00:00");

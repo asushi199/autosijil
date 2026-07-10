@@ -12,7 +12,7 @@ export async function POST(req: NextRequest, ctx: { params: Promise<{ slug: stri
     .eq("slug", slug)
     .single<Pick<EventRow, "id" | "status" | "form_fields">>();
 
-  if (!event) return NextResponse.json({ error: "Majlis tidak ditemui." }, { status: 404 });
+  if (!event) return NextResponse.json({ error: "Program tidak ditemui." }, { status: 404 });
   if (event.status !== "open") {
     return NextResponse.json({ error: "Pendaftaran kehadiran telah ditutup." }, { status: 403 });
   }

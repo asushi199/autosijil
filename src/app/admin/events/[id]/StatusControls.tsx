@@ -42,7 +42,7 @@ export default function StatusControls({
             <span className="font-medium">{active ? "● " : ""}{s.label}</span>
             <span className="block text-xs text-gray-500">
               {s.status === "released" && !hasTemplate
-                ? "Pilih templat sijil dahulu (dalam Sunting Majlis)"
+                ? "Pilih templat sijil dahulu (dalam Sunting Program)"
                 : s.hint}
             </span>
           </button>

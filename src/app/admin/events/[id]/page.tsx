@@ -4,6 +4,7 @@ import { adminClient } from "@/lib/supabase/admin";
 import { STATUS_LABEL, type Attendee, type EventRow } from "@/lib/types";
 import QrPanel from "./QrPanel";
 import StatusControls from "./StatusControls";
+import ImportPanel from "./ImportPanel";
 import { deleteAttendee, deleteEvent } from "../../actions";
 
 export const dynamic = "force-dynamic";
@@ -24,6 +25,7 @@ export default async function EventDetail({ params }: { params: Promise<{ id: st
   const base = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
   const publicUrl = `${base}/e/${event.slug}`;
   const fields = event.form_fields ?? [];
+  const nameLabel = fields.find((f) => f.role === "name")?.label ?? "Nama";
 
   return (
     <div className="space-y-5">
@@ -38,7 +40,7 @@ export default async function EventDetail({ params }: { params: Promise<{ id: st
         </div>
         <div className="flex gap-2">
           <Link href={`/admin/events/${id}/edit`} className="btn-secondary">
-            Sunting Majlis
+            Sunting Program
           </Link>
           <form
             action={async () => {
@@ -58,7 +60,7 @@ export default async function EventDetail({ params }: { params: Promise<{ id: st
         </section>
 
         <section className="card">
-          <h2 className="mb-3 font-medium">Status Majlis</h2>
+          <h2 className="mb-3 font-medium">Status Program</h2>
           <StatusControls eventId={id} current={event.status} hasTemplate={!!event.template_id} />
         </section>
       </div>
@@ -88,6 +90,10 @@ export default async function EventDetail({ params }: { params: Promise<{ id: st
               </>
             )}
           </div>
+        </div>
+
+        <div className="mb-3">
+          <ImportPanel eventId={id} nameLabel={nameLabel} />
         </div>
 
         {!attendees?.length ? (
