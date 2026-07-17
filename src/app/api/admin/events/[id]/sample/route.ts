@@ -13,9 +13,11 @@ export async function GET(_req: Request, ctx: { params: Promise<{ id: string }> 
   const sijilCtx = await loadSijilContext(event);
   if ("error" in sijilCtx) return NextResponse.json({ error: sijilCtx.error }, { status: 400 });
 
+  const schoolField = (event.form_fields ?? []).find((f) => f.role === "school");
   const pdf = await generateSijil(sijilCtx.template, sijilCtx.bgBytes, {
     name: "Ahmad Danial bin Abdullah",
     ic: "900101-08-1234",
+    school: schoolField ? "Sekolah Kebangsaan Seri Manjung" : undefined,
     eventName: event.title,
     eventDate: formatTarikh(event.event_date),
   });

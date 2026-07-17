@@ -25,6 +25,7 @@ const STANDARD: Partial<Record<FontId, StandardFonts>> = {
 export interface SijilValues {
   name: string;
   ic?: string;
+  school?: string;
   eventName: string;
   eventDate: string;
 }
@@ -36,6 +37,8 @@ function resolveText(el: TemplateElement, v: SijilValues): string {
       return nameForPrint(v.name);
     case "ic":
       return v.ic ?? "";
+    case "school":
+      return v.school ?? "";
     case "event_name":
       return v.eventName;
     case "event_date":

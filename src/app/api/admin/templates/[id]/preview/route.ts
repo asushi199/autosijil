@@ -22,6 +22,7 @@ export async function GET(_req: Request, ctx: { params: Promise<{ id: string }> 
   const pdf = await generateSijil(template, bgBytes, {
     name: "Ahmad Danial bin Abdullah",
     ic: "900101-08-1234",
+    school: "Sekolah Kebangsaan Seri Manjung",
     eventName: "Bengkel Pengurusan Data Sekolah 2026",
     eventDate: "8 Julai 2026",
   });

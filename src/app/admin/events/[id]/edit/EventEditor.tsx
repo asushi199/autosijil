@@ -39,8 +39,8 @@ export default function EventEditor({
     setFields((fs) => fs.map((f, j) => (j === i ? { ...f, ...patch } : f)));
   }
 
-  function setRole(i: number, role: "name" | "ic") {
-    // 'name' mesti unik; 'ic' juga dijadikan unik untuk kesederhanaan
+  function setRole(i: number, role: "name" | "ic" | "school") {
+    // Setiap role (name/ic/school) unik — hanya satu medan boleh memegangnya.
     setFields((fs) =>
       fs.map((f, j) => {
         if (j === i) return { ...f, role: f.role === role ? undefined : role };
@@ -137,6 +137,8 @@ export default function EventEditor({
             <p className="text-xs text-gray-500">
               Tandakan satu medan sebagai <b>Nama</b> — nilai medan itu dicetak pada sijil dan
               digunakan untuk semakan. Medan <b>IC</b> adalah pilihan (memudahkan semakan sijil).
+              Tandakan medan <b>Sekolah / Unit</b> jika anda mahu ia boleh dicetak pada sijil
+              (tambah elemen “Nama Sekolah / Unit” dalam templat).
             </p>
           </div>
           <button
@@ -216,6 +218,12 @@ export default function EventEditor({
                   </span>
                 </label>
               )}
+              <label className="flex items-center gap-1.5">
+                <input type="checkbox" checked={f.role === "school"} onChange={() => setRole(i, "school")} />
+                <span className={f.role === "school" ? "font-medium text-blue-700" : "text-gray-600"}>
+                  Sekolah / Unit (boleh dicetak pada sijil)
+                </span>
+              </label>
             </div>
           </div>
         ))}

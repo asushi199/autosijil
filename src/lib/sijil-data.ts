@@ -26,9 +26,12 @@ export async function loadSijilContext(event: EventRow) {
 }
 
 export function attendeeValues(event: EventRow, attendee: Attendee): SijilValues {
+  // Sekolah bukan lajur khas — dibaca daripada jawapan borang mengikut medan role 'school'.
+  const schoolField = (event.form_fields ?? []).find((f) => f.role === "school");
   return {
     name: attendee.name_value,
     ic: attendee.ic_value ?? undefined,
+    school: schoolField ? (attendee.data?.[schoolField.key] ?? undefined) : undefined,
     eventName: event.title,
     eventDate: formatTarikh(event.event_date),
   };

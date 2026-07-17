@@ -2,6 +2,34 @@
 
 Log keputusan dan konteks penting untuk sesi AI akan datang. Tambah entri terbaru di atas.
 
+## 2026-07-17 — Elemen "Nama Sekolah / Unit" pada sijil
+
+- **Keperluan pengguna**: sediakan elemen nama sekolah pada templat sijil untuk kegunaan
+  akan datang (belum digunakan sekarang).
+- **Keputusan**: cermin corak `ic` hujung-ke-hujung supaya templat kekal boleh guna semula
+  merentas program. Tambah `role: "school"` (FormField) + `ElementSource "school"`.
+  - `pdf.ts`: `SijilValues.school?` + `resolveText` case "school".
+  - `sijil-data.ts` `attendeeValues`: baca nilai sekolah daripada `attendee.data` mengikut
+    medan `role:"school"` (bukan lajur DB khas — jadi tiada perubahan skema).
+  - `TemplateEditor.tsx`: butang "+ Nama Sekolah / Unit" + label + nilai contoh pratonton.
+  - `EventEditor.tsx`: kotak semak tandakan medan sebagai role "school" (unik).
+  - Route pratonton templat & sampel sijil: hantar nilai sekolah contoh.
+  - `withElementDefaults`: sekolah = bukan nameLike → fit lalai "wrap" (nama sekolah panjang).
+- **Tiada perubahan skema DB.** `npm run build` + `lint` lulus.
+
+## 2026-07-17 — Import pukal berbilang lajur (medan mengikut program)
+
+- **Keperluan pengguna**: aktiviti peringkat daerah selalu perlu import data selain nama
+  (cth. nama sekolah) dan medan khas yang berbeza ikut program — tidak boleh ditetapkan.
+- **Keputusan**: `importAttendees` kekal satu kotak teks, tetapi setiap baris dikesan:
+  satu lajur (tiada Tab) = nama sahaja (kekal serasi ke belakang); berbilang lajur dipisah
+  **Tab** = dipetakan ke `form_fields` MENGIKUT SUSUNAN medan program itu (salin terus dari
+  Excel/Sheets). Nama diambil ikut medan `role:name`; IC (jika ada `role:ic`) dinormalisasi.
+  Dedupe kini ikut nama + IC (padan indeks unik DB), bukan nama sahaja.
+- **UI** `ImportPanel.tsx`: terima `fields` (bukan lagi `nameLabel`); papar susunan lajur
+  secara dinamik (chip medan, medan nama ditonjol biru) + contoh placeholder ber-Tab.
+- **Tiada perubahan skema DB.** `npm run build` + `lint` lulus.
+
 ## 2026-07-17 — Penambahbaikan UX (semakan dari perspektif pengguna)
 
 - **Keperluan pengguna**: semak semula aliran dari sudut peserta & urus setia, laksana semua

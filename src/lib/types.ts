@@ -6,11 +6,14 @@ export interface FormField {
   type: FieldType;
   required: boolean;
   options?: string[];
-  /** 'name' = dicetak pada sijil & digunakan untuk semakan; 'ic' = pilihan tambahan untuk semakan */
-  role?: "name" | "ic";
+  /**
+   * 'name' = dicetak pada sijil & digunakan untuk semakan; 'ic' = pilihan tambahan
+   * untuk semakan; 'school' = nama sekolah/unit yang boleh dicetak pada sijil.
+   */
+  role?: "name" | "ic" | "school";
 }
 
-export type ElementSource = "name" | "ic" | "event_name" | "event_date" | "static";
+export type ElementSource = "name" | "ic" | "school" | "event_name" | "event_date" | "static";
 
 export type FontId =
   | "helvetica"

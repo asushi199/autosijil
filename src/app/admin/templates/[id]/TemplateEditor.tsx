@@ -33,6 +33,7 @@ const FONT_CSS: Record<FontId, string> = {
 const SOURCE_LABEL: Record<ElementSource, string> = {
   name: "Nama Peserta",
   ic: "No. Kad Pengenalan",
+  school: "Nama Sekolah / Unit",
   event_name: "Nama Program",
   event_date: "Tarikh Program",
   static: "Teks Statik",
@@ -41,6 +42,7 @@ const SOURCE_LABEL: Record<ElementSource, string> = {
 const SAMPLE: Record<Exclude<ElementSource, "static">, string> = {
   name: "Muhammad Firdaus bin Abdul Rahman",
   ic: "900101-08-1234",
+  school: "Sekolah Kebangsaan Seri Manjung",
   event_name: "WORK COE: Penataran Modul Pendigitalan Google, Canva dan AI",
   event_date: "8 Julai 2026",
 };
