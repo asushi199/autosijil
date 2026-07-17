@@ -28,7 +28,6 @@ export default async function EventDetail({ params }: { params: Promise<{ id: st
   const publicUrl = `${base}/e/${event.slug}`;
   const fields = event.form_fields ?? [];
   const nameField = fields.find((f) => f.role === "name");
-  const nameLabel = nameField?.label ?? "Nama";
 
   return (
     <div className="space-y-5">
@@ -98,7 +97,7 @@ export default async function EventDetail({ params }: { params: Promise<{ id: st
         </div>
 
         <div className="mb-3">
-          <ImportPanel eventId={id} nameLabel={nameLabel} />
+          <ImportPanel eventId={id} fields={fields} />
         </div>
 
         {!attendees?.length ? (
