@@ -2,6 +2,28 @@
 
 Log keputusan dan konteks penting untuk sesi AI akan datang. Tambah entri terbaru di atas.
 
+## 2026-07-17 — Penambahbaikan UX (semakan dari perspektif pengguna)
+
+- **Keperluan pengguna**: semak semula aliran dari sudut peserta & urus setia, laksana semua
+  penambahbaikan yang dikenal pasti sekaligus.
+- **Peserta**:
+  - Semakan sijil kini tahan ruang berlebihan — `normalizeName()` (baharu, `sijil-data.ts`)
+    kecutkan ruang & huruf kecil. `semak/route.ts` tapik dalam JS (bukan lagi `ilike` DB)
+    supaya "Ali  bin  Abu" padan "Ali bin Abu".
+  - Borang kehadiran (`AttendanceForm.tsx`) papar semula nama yang diisi selepas hantar,
+    dengan peringatan betulkan dengan urus setia jika silap.
+- **Urus setia (admin)**:
+  - Jadual kehadiran diekstrak ke `AttendeeTable.tsx` (klien): kotak carian, sunting nama
+    inline (`updateAttendeeName()` baharu dalam `actions.ts` — kemas `name_value` + `data`,
+    kendali 23505 nama pendua), pautan muat turun sijil per-baris, dan padam dengan `confirm()`.
+  - Route baharu `api/admin/events/[id]/sijil?attendee=<id>` — jana sijil seorang peserta
+    tanpa mengira status program (lindung proxy admin). Selesaikan kes peserta nama sama yang
+    tidak boleh semak sendiri.
+  - Padam Program kini melalui `ConfirmSubmit.tsx` (baharu) — minta pengesahan dulu.
+- **Tiada perubahan skema DB.**
+- **Pengesahan**: `npm run build` + `lint` lulus. Ujian visual langsung tidak dijalankan
+  (perlukan Supabase + `.env.local` yang tiada dalam persekitaran ini).
+
 ## 2026-07-10 — Import pukal senarai + tukar "Majlis" → "Program" + bar tab mudah alih
 
 - **Keperluan pengguna**: (1) kadangkala sijil perlu diberi tanpa peserta mengisi borang

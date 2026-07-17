@@ -5,7 +5,9 @@ import { STATUS_LABEL, type Attendee, type EventRow } from "@/lib/types";
 import QrPanel from "./QrPanel";
 import StatusControls from "./StatusControls";
 import ImportPanel from "./ImportPanel";
-import { deleteAttendee, deleteEvent } from "../../actions";
+import AttendeeTable from "./AttendeeTable";
+import ConfirmSubmit from "../../ConfirmSubmit";
+import { deleteEvent } from "../../actions";
 
 export const dynamic = "force-dynamic";
 
@@ -25,7 +27,8 @@ export default async function EventDetail({ params }: { params: Promise<{ id: st
   const base = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
   const publicUrl = `${base}/e/${event.slug}`;
   const fields = event.form_fields ?? [];
-  const nameLabel = fields.find((f) => f.role === "name")?.label ?? "Nama";
+  const nameField = fields.find((f) => f.role === "name");
+  const nameLabel = nameField?.label ?? "Nama";
 
   return (
     <div className="space-y-5">
@@ -42,14 +45,16 @@ export default async function EventDetail({ params }: { params: Promise<{ id: st
           <Link href={`/admin/events/${id}/edit`} className="btn-secondary">
             Sunting Program
           </Link>
-          <form
+          <ConfirmSubmit
             action={async () => {
               "use server";
               await deleteEvent(id);
             }}
+            message={`Padam program "${event.title}" dan semua rekod kehadirannya? Tindakan ini tidak boleh diundur.`}
+            className="btn-danger"
           >
-            <button type="submit" className="btn-danger">Padam</button>
-          </form>
+            Padam
+          </ConfirmSubmit>
         </div>
       </div>
 
@@ -101,45 +106,13 @@ export default async function EventDetail({ params }: { params: Promise<{ id: st
             Tiada kehadiran lagi. Kongsikan QR / pautan di atas kepada peserta.
           </p>
         ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="border-b border-gray-200 text-left text-gray-500">
-                  <th className="px-3 py-2 font-medium">#</th>
-                  {fields.map((f) => (
-                    <th key={f.key} className="px-3 py-2 font-medium">{f.label}</th>
-                  ))}
-                  <th className="px-3 py-2 font-medium">Masa</th>
-                  <th className="px-3 py-2" />
-                </tr>
-              </thead>
-              <tbody>
-                {attendees.map((a, i) => (
-                  <tr key={a.id} className="border-b border-gray-100 last:border-0">
-                    <td className="px-3 py-2 text-gray-400">{i + 1}</td>
-                    {fields.map((f) => (
-                      <td key={f.key} className="px-3 py-2">{a.data?.[f.key] ?? ""}</td>
-                    ))}
-                    <td className="px-3 py-2 text-gray-500 whitespace-nowrap">
-                      {new Date(a.created_at).toLocaleString("ms-MY")}
-                    </td>
-                    <td className="px-3 py-2 text-right">
-                      <form
-                        action={async () => {
-                          "use server";
-                          await deleteAttendee(id, a.id);
-                        }}
-                      >
-                        <button type="submit" className="text-xs text-red-600 hover:underline cursor-pointer">
-                          padam
-                        </button>
-                      </form>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+          <AttendeeTable
+            eventId={id}
+            attendees={attendees}
+            fields={fields}
+            nameKey={nameField?.key ?? null}
+            hasTemplate={!!event.template_id}
+          />
         )}
       </section>
     </div>

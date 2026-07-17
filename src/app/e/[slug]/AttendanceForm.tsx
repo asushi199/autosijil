@@ -4,6 +4,7 @@ import { useState } from "react";
 import type { FormField } from "@/lib/types";
 
 export default function AttendanceForm({ slug, fields }: { slug: string; fields: FormField[] }) {
+  const nameKey = fields.find((f) => f.role === "name")?.key;
   const [values, setValues] = useState<Record<string, string>>({});
   const [submitting, setSubmitting] = useState(false);
   const [done, setDone] = useState(false);
@@ -37,10 +38,20 @@ export default function AttendanceForm({ slug, fields }: { slug: string; fields:
   }
 
   if (done) {
+    const submittedName = nameKey ? (values[nameKey] ?? "").trim() : "";
     return (
       <div className="card text-center">
         <div className="mb-2 text-3xl">✅</div>
         <p className="font-medium">Terima kasih! Kehadiran anda telah direkodkan.</p>
+        {submittedName && (
+          <p className="mt-3 rounded-lg bg-gray-50 px-3 py-2 text-sm text-gray-700">
+            Nama untuk sijil: <b>{submittedName}</b>
+          </p>
+        )}
+        <p className="mt-2 text-sm text-gray-500">
+          Semak ejaan nama di atas — nama inilah yang akan dicetak pada sijil. Jika silap,
+          sila maklumkan kepada urus setia program.
+        </p>
         <p className="mt-2 text-sm text-gray-500">
           Sijil penyertaan boleh dimuat turun <b>di pautan yang sama</b> selepas dibuka oleh
           urus setia program.

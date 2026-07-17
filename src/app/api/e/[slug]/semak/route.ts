@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { adminClient } from "@/lib/supabase/admin";
 import { sijilToken } from "@/lib/token";
+import { normalizeName } from "@/lib/sijil-data";
 import type { EventRow } from "@/lib/types";
 
 export async function POST(req: NextRequest, ctx: { params: Promise<{ slug: string }> }) {
@@ -28,14 +29,15 @@ export async function POST(req: NextRequest, ctx: { params: Promise<{ slug: stri
     return NextResponse.json({ error: "Sila masukkan nama penuh anda." }, { status: 400 });
   }
 
-  // Padanan mengikut nama penuh (tidak sensitif huruf besar/kecil)
+  // Padanan mengikut nama penuh — tidak sensitif huruf besar/kecil DAN
+  // tahan ruang berlebihan (cth. dua ruang antara perkataan). Bandingkan nama
+  // yang dinormalisasi supaya salah taip ruang tidak menyebabkan "tiada rekod".
+  const q = normalizeName(query);
   const { data } = await db
     .from("attendees")
     .select("id, name_value")
-    .eq("event_id", event.id)
-    .ilike("name_value", query)
-    .limit(3);
-  const matches = data ?? [];
+    .eq("event_id", event.id);
+  const matches = (data ?? []).filter((r) => normalizeName(r.name_value) === q);
 
   if (!matches.length) {
     return NextResponse.json(

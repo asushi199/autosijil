@@ -48,6 +48,15 @@ export function normalizeIc(s: string): string {
   return s.replace(/[\s-]/g, "");
 }
 
+/**
+ * Normalisasi nama untuk padanan semakan sijil: kecutkan ruang berlebihan jadi
+ * satu ruang, buang ruang hujung, dan huruf kecil. Supaya "Ali  bin  Abu"
+ * (dua ruang) padan dengan "Ali bin Abu".
+ */
+export function normalizeName(s: string): string {
+  return s.trim().replace(/\s+/g, " ").toLowerCase();
+}
+
 /** Nama fail selamat daripada nama peserta. */
 export function safeFilename(s: string): string {
   return s.replace(/[^\p{L}\p{N} _.-]/gu, "").trim().replace(/\s+/g, "_") || "sijil";

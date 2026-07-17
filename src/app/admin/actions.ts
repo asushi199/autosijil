@@ -94,6 +94,43 @@ export async function deleteAttendee(eventId: string, attendeeId: string) {
   revalidatePath(`/admin/events/${eventId}`);
 }
 
+/** Kemas kini nama seorang peserta (betulkan salah taip supaya semakan sijil padan). */
+export async function updateAttendeeName(eventId: string, attendeeId: string, newName: string) {
+  await requireUser();
+  const name = newName.trim();
+  if (!name) return { error: "Nama tidak boleh kosong." };
+  if (name.length > 300) return { error: "Nama terlalu panjang." };
+
+  const db = adminClient();
+  const { data: event } = await db
+    .from("events")
+    .select("form_fields")
+    .eq("id", eventId)
+    .single<{ form_fields: FormField[] }>();
+  const nameKey = (event?.form_fields ?? []).find((f) => f.role === "name")?.key;
+
+  const { data: attendee } = await db
+    .from("attendees")
+    .select("data")
+    .eq("id", attendeeId)
+    .eq("event_id", eventId)
+    .single<{ data: Record<string, string> }>();
+  const data = { ...(attendee?.data ?? {}) };
+  if (nameKey) data[nameKey] = name;
+
+  const { error } = await db
+    .from("attendees")
+    .update({ name_value: name, data })
+    .eq("id", attendeeId)
+    .eq("event_id", eventId);
+  if (error) {
+    if (error.code === "23505") return { error: "Nama ini sudah wujud dalam program." };
+    return { error: error.message };
+  }
+  revalidatePath(`/admin/events/${eventId}`);
+  return { ok: true };
+}
+
 /**
  * Import senarai peserta secara pukal — satu nama satu baris.
  * Digunakan apabila sijil perlu dijana tanpa peserta mengisi borang.
