@@ -41,6 +41,15 @@ create index if not exists attendees_event_idx on public.attendees(event_id);
 create index if not exists attendees_name_idx on public.attendees(event_id, lower(name_value));
 create index if not exists attendees_ic_idx on public.attendees(event_id, ic_value);
 
+create table if not exists public.school_directory (
+  code text primary key,
+  name text not null,
+  zone text not null,
+  source_updated_at timestamptz,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+
 -- Elak rekod kehadiran berganda (nama + IC sama dalam majlis sama)
 create unique index if not exists attendees_dedupe_idx
   on public.attendees(event_id, lower(name_value), coalesce(ic_value, ''));
@@ -53,6 +62,7 @@ create unique index if not exists attendees_dedupe_idx
 alter table public.templates enable row level security;
 alter table public.events enable row level security;
 alter table public.attendees enable row level security;
+alter table public.school_directory enable row level security;
 
 -- ============ Storan ============
 -- Baldi awam untuk imej latar templat (dibaca terus oleh editor pratonton)
