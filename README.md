@@ -60,6 +60,10 @@ Satu kata laluan sahaja dikongsi oleh pasukan — tiada akaun individu untuk diu
   tekan **Buka Kehadiran** → edarkan QR.
 - **Status program**: Draf → Buka Kehadiran → Tutup Kehadiran → Buka Muat Turun Sijil.
 
+Apabila muat turun sijil dibuka, peserta boleh menaip sekurang-kurangnya tiga aksara nama
+untuk menerima sehingga lapan cadangan nama secara masa nyata. Klik nama yang betul untuk
+mengesahkan dan memuat turun sijil; carian nama penuh melalui butang **Semak** juga kekal ada.
+
 ### Direktori Sekolah
 
 Pada penyunting Program, tambah medan **Direktori Sekolah** untuk memaparkan pilihan seperti

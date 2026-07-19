@@ -2,6 +2,15 @@
 
 Log keputusan dan konteks penting untuk sesi AI akan datang. Tambah entri terbaru di atas.
 
+## 2026-07-19 — Carian sijil masa nyata
+
+- **Keperluan pengguna**: peserta boleh mencari sijil sendiri dengan carian nama kabur dan
+  mendapat maklum balas segera; pengguna meluluskan paparan nama penuh.
+- **Keputusan**: route awam `cadangan` hanya aktif apabila status Program `released`, memerlukan
+  sekurang-kurangnya tiga aksara, dan memulangkan maksimum lapan nama sahaja (tanpa ID, token,
+  IC atau jawapan borang). Klik cadangan masih melalui `semak` tepat untuk mengeluarkan token;
+  pendua nama kekal perlu diurus urus setia.
+
 ## 2026-07-19 — Pencari Direktori Sekolah
 
 - **Keperluan pengguna**: pilihan sekolah perlu disusun mengikut kod dan boleh dicari melalui
