@@ -35,7 +35,7 @@ export async function GET(req: NextRequest, ctx: { params: Promise<{ slug: strin
   const ctx2 = await loadSijilContext(event);
   if ("error" in ctx2) return NextResponse.json({ error: ctx2.error }, { status: 500 });
 
-  const pdf = await generateSijil(ctx2.template, ctx2.bgBytes, attendeeValues(event, attendee, ctx2.template));
+  const pdf = await generateSijil(ctx2.template, ctx2.bgBytes, attendeeValues(event, attendee, ctx2.template, ctx2.schools));
   return new NextResponse(Buffer.from(pdf), {
     headers: {
       "Content-Type": "application/pdf",

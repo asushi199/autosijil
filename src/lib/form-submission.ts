@@ -32,7 +32,11 @@ export function formatFormValue(value: FormValue | undefined): string {
   return Array.isArray(value) ? value.join(", ") : value ?? "";
 }
 
-function validateSingleValue(field: FormField, raw: unknown): string | { error: string } {
+function validateSingleValue(
+  field: FormField,
+  raw: unknown,
+  schoolCodes?: ReadonlySet<string>,
+): string | { error: string } {
   const value = normalizeString(raw);
   if (value === null) return field.required ? requiredError(field) : "";
   if (!value) return field.required ? requiredError(field) : "";
@@ -43,6 +47,7 @@ function validateSingleValue(field: FormField, raw: unknown): string | { error: 
   if ((field.type === "select" || field.type === "radio") && !(field.options ?? []).includes(value)) {
     return optionError(field);
   }
+  if (field.type === "school" && !schoolCodes?.has(value)) return optionError(field);
   if (field.type === "date" && !dateIsValid(value)) {
     return { error: `Tarikh bagi medan "${field.label}" tidak sah.` };
   }
@@ -52,7 +57,11 @@ function validateSingleValue(field: FormField, raw: unknown): string | { error: 
   return value;
 }
 
-export function validateSubmission(fields: FormField[], raw: Record<string, unknown>): SubmissionResult {
+export function validateSubmission(
+  fields: FormField[],
+  raw: Record<string, unknown>,
+  schoolCodes?: ReadonlySet<string>,
+): SubmissionResult {
   const data: AttendeeData = {};
 
   for (const field of fields) {
@@ -65,7 +74,7 @@ export function validateSubmission(fields: FormField[], raw: Record<string, unkn
       continue;
     }
 
-    const value = validateSingleValue(field, raw[field.key]);
+    const value = validateSingleValue(field, raw[field.key], schoolCodes);
     if (typeof value !== "string") return value;
     data[field.key] = value;
   }

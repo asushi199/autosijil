@@ -1,8 +1,9 @@
 import "server-only";
 import { adminClient } from "./supabase/admin";
 import { formatTarikh, type SijilValues } from "./pdf";
-import type { Attendee, EventRow, FormField, Template } from "./types";
+import type { Attendee, AttendeeData, EventRow, FormField, Template } from "./types";
 import { mappedSlotValues } from "./certificate-mapping";
+import { schoolLabelForCode, type SchoolDirectoryEntry } from "./school-directory";
 
 /** Muat program + templat + imej latar untuk penjanaan sijil. */
 export async function loadSijilContext(event: EventRow) {
@@ -23,13 +24,28 @@ export async function loadSijilContext(event: EventRow) {
     if (error || !blob) return { error: "Imej latar templat tidak dapat dimuat." };
     bgBytes = new Uint8Array(await blob.arrayBuffer());
   }
-  return { template, bgBytes };
+  const schools: SchoolDirectoryEntry[] = (event.form_fields ?? []).some((field) => field.type === "school")
+    ? ((await db.from("school_directory").select("code, name, zone").order("name")).data ?? []) as SchoolDirectoryEntry[]
+    : [];
+  return { template, bgBytes, schools };
 }
 
-export function attendeeValues(event: EventRow, attendee: Attendee, template?: Template): SijilValues {
+export function attendeeValues(
+  event: EventRow,
+  attendee: Attendee,
+  template?: Template,
+  schools: SchoolDirectoryEntry[] = [],
+): SijilValues {
+  const displayData: AttendeeData = { ...attendee.data };
+  for (const field of event.form_fields ?? []) {
+    const value = displayData[field.key];
+    if (field.type === "school" && typeof value === "string") {
+      displayData[field.key] = schoolLabelForCode(value, schools);
+    }
+  }
   // Sekolah bukan lajur khas — dibaca daripada jawapan borang mengikut medan role 'school'.
   const schoolField = (event.form_fields ?? []).find((f) => f.role === "school");
-  const schoolValue = schoolField ? attendee.data?.[schoolField.key] : undefined;
+  const schoolValue = schoolField ? displayData[schoolField.key] : undefined;
   return {
     name: attendee.name_value,
     ic: attendee.ic_value ?? undefined,
@@ -37,7 +53,7 @@ export function attendeeValues(event: EventRow, attendee: Attendee, template?: T
     eventName: event.title,
     eventDate: formatTarikh(event.event_date),
     eventLocation: event.location ?? "",
-    slots: template ? mappedSlotValues(template, event.certificate_field_mappings ?? {}, attendee.data) : {},
+    slots: template ? mappedSlotValues(template, event.certificate_field_mappings ?? {}, displayData) : {},
   };
 }
 

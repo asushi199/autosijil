@@ -2,19 +2,22 @@
 
 import { useMemo, useState, useTransition } from "react";
 import type { Attendee, FormField } from "@/lib/types";
+import type { SchoolDirectoryEntry } from "@/lib/school-directory";
 import { deleteAttendee, updateAttendeeName } from "../../actions";
-import { formatFormValue } from "@/lib/form-submission";
+import { formatFieldValue } from "@/lib/school-directory";
 
 export default function AttendeeTable({
   eventId,
   attendees,
   fields,
+  schools,
   nameKey,
   hasTemplate,
 }: {
   eventId: string;
   attendees: Attendee[];
   fields: FormField[];
+  schools: SchoolDirectoryEntry[];
   nameKey: string | null;
   hasTemplate: boolean;
 }) {
@@ -30,9 +33,9 @@ export default function AttendeeTable({
     return attendees.filter(
       (a) =>
         a.name_value.toLowerCase().includes(q) ||
-        fields.some((f) => formatFormValue(a.data?.[f.key]).toLowerCase().includes(q)),
+        fields.some((f) => formatFieldValue(f, a.data?.[f.key], schools).toLowerCase().includes(q)),
     );
-  }, [attendees, fields, query]);
+  }, [attendees, fields, query, schools]);
 
   function startEdit(a: Attendee) {
     setError(null);
@@ -111,7 +114,7 @@ export default function AttendeeTable({
                             }}
                           />
                         ) : (
-                          formatFormValue(a.data?.[f.key])
+                          formatFieldValue(f, a.data?.[f.key], schools)
                         )}
                       </td>
                     ))}

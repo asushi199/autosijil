@@ -64,6 +64,20 @@ describe("validateSubmission", () => {
     });
   });
 
+  it("accepts only school codes present in the directory", () => {
+    const schoolFields: FormField[] = [
+      { key: "nama", label: "Nama", type: "text", required: true, role: "name" },
+      { key: "sekolah", label: "Sekolah", type: "school", required: true, role: "school" },
+    ];
+
+    expect(
+      validateSubmission(schoolFields, { nama: "Ali", sekolah: "ABA1001" }, new Set(["ABA1001"])),
+    ).toMatchObject({ data: { sekolah: "ABA1001" } });
+    expect(
+      validateSubmission(schoolFields, { nama: "Ali", sekolah: "SALAH" }, new Set(["ABA1001"])),
+    ).toEqual({ error: 'Pilihan bagi medan "Sekolah" tidak sah.' });
+  });
+
   it("formats multiselect values for tables and CSV", () => {
     expect(formatFormValue(["AI", "Canva"])).toBe("AI, Canva");
   });

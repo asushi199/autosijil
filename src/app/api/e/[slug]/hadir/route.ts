@@ -24,7 +24,15 @@ export async function POST(req: NextRequest, ctx: { params: Promise<{ slug: stri
     return NextResponse.json({ error: "Permintaan tidak sah." }, { status: 400 });
   }
 
-  const result = validateSubmission(event.form_fields ?? [], body.data ?? {});
+  const fields = event.form_fields ?? [];
+  let schoolCodes: ReadonlySet<string> | undefined;
+  if (fields.some((field) => field.type === "school")) {
+    const { data: schools, error } = await db.from("school_directory").select("code");
+    if (error) return NextResponse.json({ error: "Direktori sekolah tidak dapat dimuatkan." }, { status: 500 });
+    schoolCodes = new Set((schools ?? []).map((school) => school.code));
+  }
+
+  const result = validateSubmission(fields, body.data ?? {}, schoolCodes);
   if ("error" in result) return NextResponse.json({ error: result.error }, { status: 400 });
 
   const { error } = await db

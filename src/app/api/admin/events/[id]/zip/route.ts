@@ -29,7 +29,7 @@ export async function GET(_req: Request, ctx: { params: Promise<{ id: string }> 
   const zip = new JSZip();
   const used = new Set<string>();
   for (const a of attendees) {
-    const pdf = await generateSijil(sijilCtx.template, sijilCtx.bgBytes, attendeeValues(event, a, sijilCtx.template));
+    const pdf = await generateSijil(sijilCtx.template, sijilCtx.bgBytes, attendeeValues(event, a, sijilCtx.template, sijilCtx.schools));
     const base = `Sijil_${safeFilename(a.name_value)}`;
     let filename = `${base}.pdf`;
     for (let n = 2; used.has(filename); n++) filename = `${base}_${n}.pdf`;

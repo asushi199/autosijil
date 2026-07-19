@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { adminClient } from "@/lib/supabase/admin";
 import { STATUS_LABEL, type Attendee, type EventRow } from "@/lib/types";
+import type { SchoolDirectoryEntry } from "@/lib/school-directory";
 import QrPanel from "./QrPanel";
 import StatusControls from "./StatusControls";
 import ImportPanel from "./ImportPanel";
@@ -16,6 +17,10 @@ export default async function EventDetail({ params }: { params: Promise<{ id: st
   const db = adminClient();
   const { data: event } = await db.from("events").select("*").eq("id", id).single<EventRow>();
   if (!event) notFound();
+  const fields = event.form_fields ?? [];
+  const schools: SchoolDirectoryEntry[] = fields.some((field) => field.type === "school")
+    ? ((await db.from("school_directory").select("code, name, zone").order("name")).data ?? []) as SchoolDirectoryEntry[]
+    : [];
 
   const { data: attendees } = await db
     .from("attendees")
@@ -26,7 +31,6 @@ export default async function EventDetail({ params }: { params: Promise<{ id: st
 
   const base = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
   const publicUrl = `${base}/e/${event.slug}`;
-  const fields = event.form_fields ?? [];
   const nameField = fields.find((f) => f.role === "name");
 
   return (
@@ -109,6 +113,7 @@ export default async function EventDetail({ params }: { params: Promise<{ id: st
             eventId={id}
             attendees={attendees}
             fields={fields}
+            schools={schools}
             nameKey={nameField?.key ?? null}
             hasTemplate={!!event.requires_certificate && !!event.template_id}
           />
