@@ -208,7 +208,13 @@ export default function EventEditor({
               <select
                 className="input w-auto"
                 value={f.type}
-                onChange={(e) => patchField(i, { type: e.target.value as FieldType })}
+                onChange={(e) => {
+                  const type = e.target.value as FieldType;
+                  setFields((current) => current.map((field, index) => {
+                    if (index === i) return { ...field, type, role: type === "ic" ? "ic" : field.role };
+                    return type === "ic" && field.role === "ic" ? { ...field, role: undefined } : field;
+                  }));
+                }}
               >
                 {(Object.keys(TYPE_LABEL) as FieldType[]).map((t) => (
                   <option key={t} value={t}>{TYPE_LABEL[t]}</option>
@@ -262,7 +268,7 @@ export default function EventEditor({
                   Nama (dicetak pada sijil)
                 </span>
               </label>
-              {f.type === "text" && (
+              {(f.type === "text" || f.type === "ic") && (
                 <label className="flex items-center gap-1.5">
                   <input type="checkbox" checked={f.role === "ic"} onChange={() => setRole(i, "ic")} />
                   <span className={f.role === "ic" ? "font-medium text-blue-700" : "text-gray-600"}>
