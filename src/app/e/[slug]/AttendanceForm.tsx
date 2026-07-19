@@ -2,14 +2,17 @@
 
 import { useState } from "react";
 import type { AttendeeData, FormField, FormValue } from "@/lib/types";
+import { schoolOptionLabel, type SchoolDirectoryEntry } from "@/lib/school-directory";
 
 export default function AttendanceForm({
   slug,
   fields,
+  schools,
   isRegistration = false,
 }: {
   slug: string;
   fields: FormField[];
+  schools: SchoolDirectoryEntry[];
   isRegistration?: boolean;
 }) {
   const nameKey = fields.find((f) => f.role === "name")?.key;
@@ -98,6 +101,19 @@ export default function AttendanceForm({
               value={stringValue(f.key)}
               onChange={(e) => setValue(f.key, e.target.value)}
             />
+          )}
+          {f.type === "school" && (
+            <select
+              className="input"
+              required={f.required}
+              value={stringValue(f.key)}
+              onChange={(e) => setValue(f.key, e.target.value)}
+            >
+              <option value="">— Pilih sekolah —</option>
+              {schools.map((school) => (
+                <option key={school.code} value={school.code}>{schoolOptionLabel(school)}</option>
+              ))}
+            </select>
           )}
           {f.type === "select" && (
             <select

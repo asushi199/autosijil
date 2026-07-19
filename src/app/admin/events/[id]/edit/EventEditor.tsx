@@ -22,6 +22,7 @@ const TYPE_LABEL: Record<FieldType, string> = {
   checkboxes: "Pilihan berbilang",
   date: "Tarikh",
   ic: "No. Kad Pengenalan",
+  school: "Direktori Sekolah",
 };
 
 export default function EventEditor({

@@ -1,5 +1,6 @@
 import { adminClient } from "@/lib/supabase/admin";
 import type { EventRow } from "@/lib/types";
+import type { SchoolDirectoryEntry } from "@/lib/school-directory";
 import AttendanceForm from "./AttendanceForm";
 import SemakSijil from "./SemakSijil";
 
@@ -38,6 +39,11 @@ export default async function PublicEventPage({
     );
   }
 
+  const fields = event.form_fields ?? [];
+  const schools: SchoolDirectoryEntry[] = fields.some((field) => field.type === "school")
+    ? ((await db.from("school_directory").select("code, name, zone").order("name")).data ?? []) as SchoolDirectoryEntry[]
+    : [];
+
   const meta = (
     <p className="mb-4 text-sm text-gray-500">
       {event.event_date && <>Tarikh: {event.event_date}</>}
@@ -51,7 +57,7 @@ export default async function PublicEventPage({
         {meta}
         {event.description && <p className="mb-4 text-sm text-gray-600">{event.description}</p>}
         {!event.requires_certificate && <p className="mb-3 text-sm font-medium text-blue-800">Borang Pendaftaran</p>}
-        <AttendanceForm slug={event.slug} fields={event.form_fields ?? []} isRegistration={!event.requires_certificate} />
+        <AttendanceForm slug={event.slug} fields={fields} schools={schools} isRegistration={!event.requires_certificate} />
       </Shell>
     );
   }
