@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { updateEvent } from "../../../actions";
 import type { EventRow, FieldType, FormField, Template } from "@/lib/types";
+import { getTemplateSlots } from "@/lib/certificate-mapping";
 
 let counter = 0;
 function newKey() {
@@ -13,9 +14,13 @@ function newKey() {
 
 const TYPE_LABEL: Record<FieldType, string> = {
   text: "Teks",
+  textarea: "Perenggan",
   select: "Senarai pilihan",
   radio: "Butang pilihan",
   checkbox: "Kotak semak (ya/tidak)",
+  checkboxes: "Pilihan berbilang",
+  date: "Tarikh",
+  ic: "No. Kad Pengenalan",
 };
 
 export default function EventEditor({
@@ -23,7 +28,7 @@ export default function EventEditor({
   templates,
 }: {
   event: EventRow;
-  templates: Pick<Template, "id" | "name" | "orientation">[];
+  templates: Pick<Template, "id" | "name" | "orientation" | "elements">[];
 }) {
   const router = useRouter();
   const [pending, startTransition] = useTransition();
@@ -32,6 +37,8 @@ export default function EventEditor({
   const [eventDate, setEventDate] = useState(event.event_date ?? "");
   const [location, setLocation] = useState(event.location ?? "");
   const [templateId, setTemplateId] = useState(event.template_id ?? "");
+  const [requiresCertificate, setRequiresCertificate] = useState(event.requires_certificate ?? true);
+  const [mappings, setMappings] = useState<Record<string, string>>(event.certificate_field_mappings ?? {});
   const [fields, setFields] = useState<FormField[]>(event.form_fields ?? []);
   const [msg, setMsg] = useState<{ kind: "ok" | "err"; text: string } | null>(null);
 
@@ -69,6 +76,8 @@ export default function EventEditor({
         location: location.trim() || null,
         form_fields: fields,
         template_id: templateId || null,
+        requires_certificate: requiresCertificate,
+        certificate_field_mappings: mappings,
       });
       if (res?.error) setMsg({ kind: "err", text: res.error });
       else {
@@ -89,10 +98,14 @@ export default function EventEditor({
 
       <section className="card space-y-4">
         <h2 className="font-medium">Maklumat Program</h2>
-        <div>
+        <label className="flex items-center gap-2 text-sm">
+          <input type="checkbox" checked={requiresCertificate} onChange={(e) => setRequiresCertificate(e.target.checked)} />
+          Perlu sijil untuk peserta
+        </label>
+        {requiresCertificate && <div>
           <label className="label">Nama program *</label>
           <input className="input" value={title} onChange={(e) => setTitle(e.target.value)} />
-        </div>
+        </div>}
         <div>
           <label className="label">Keterangan (dipaparkan pada borang)</label>
           <textarea
@@ -129,6 +142,35 @@ export default function EventEditor({
           </div>
         </div>
       </section>
+
+      {requiresCertificate && templateId && (() => {
+        const template = templates.find((item) => item.id === templateId);
+        const slots = template ? getTemplateSlots(template as Template) : [];
+        const printable = fields.filter((field) => field.certificateEligible && field.type !== "checkboxes");
+        if (!slots.length) return null;
+        return (
+          <section className="card space-y-3">
+            <div>
+              <h2 className="font-medium">Pemetaan Maklumat Sijil</h2>
+              <p className="text-xs text-gray-500">Pilih medan secara manual untuk setiap slot templat.</p>
+            </div>
+            {slots.map((slot) => (
+              <label key={slot.slotId} className="block text-sm">
+                <span className="mb-1 block font-medium">{slot.slotLabel || "Maklumat peserta"}</span>
+                <select
+                  className="input"
+                  value={mappings[slot.slotId ?? ""] ?? ""}
+                  onChange={(e) => setMappings((current) => ({ ...current, [slot.slotId ?? ""]: e.target.value }))}
+                >
+                  <option value="">— Pilih medan —</option>
+                  {printable.map((field) => <option key={field.key} value={field.key}>{field.label}</option>)}
+                </select>
+              </label>
+            ))}
+            {!printable.length && <p className="text-sm text-amber-700">Tandakan sekurang-kurangnya satu medan sebagai boleh dicetak pada sijil.</p>}
+          </section>
+        );
+      })()}
 
       <section className="card space-y-3">
         <div className="flex items-center justify-between">
@@ -191,7 +233,7 @@ export default function EventEditor({
                 </button>
               </div>
             </div>
-            {(f.type === "select" || f.type === "radio") && (
+            {(f.type === "select" || f.type === "radio" || f.type === "checkboxes") && (
               <input
                 className="input"
                 placeholder="Pilihan dipisahkan dengan koma, cth. Guru, PPD, Pentadbir"
@@ -202,6 +244,16 @@ export default function EventEditor({
                   })
                 }
               />
+            )}
+            {f.type !== "checkboxes" && f.role !== "name" && (
+              <label className="flex gap-1.5 text-sm text-gray-600">
+                <input
+                  type="checkbox"
+                  checked={!!f.certificateEligible}
+                  onChange={(e) => patchField(i, { certificateEligible: e.target.checked })}
+                />
+                Boleh dicetak pada sijil
+              </label>
             )}
             <div className="flex gap-3 text-sm">
               <label className="flex items-center gap-1.5">

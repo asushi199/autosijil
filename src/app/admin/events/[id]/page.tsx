@@ -65,7 +65,7 @@ export default async function EventDetail({ params }: { params: Promise<{ id: st
 
         <section className="card">
           <h2 className="mb-3 font-medium">Status Program</h2>
-          <StatusControls eventId={id} current={event.status} hasTemplate={!!event.template_id} />
+          <StatusControls eventId={id} current={event.status} hasTemplate={!!event.template_id} requiresCertificate={event.requires_certificate ?? true} />
         </section>
       </div>
 
@@ -75,7 +75,7 @@ export default async function EventDetail({ params }: { params: Promise<{ id: st
             Kehadiran <span className="text-gray-400">({attendees?.length ?? 0})</span>
           </h2>
           <div className="flex flex-wrap gap-2">
-            {event.template_id && (
+            {event.requires_certificate && event.template_id && (
               <a href={`/api/admin/events/${id}/sample`} target="_blank" className="btn-secondary text-xs">
                 Pratonton Sijil
               </a>
@@ -83,7 +83,7 @@ export default async function EventDetail({ params }: { params: Promise<{ id: st
             <a href={`/api/admin/events/${id}/csv`} className="btn-secondary text-xs">
               Eksport CSV
             </a>
-            {event.template_id && (attendees?.length ?? 0) > 0 && (
+            {event.requires_certificate && event.template_id && (attendees?.length ?? 0) > 0 && (
               <>
                 <a href={`/api/admin/events/${id}/pdf`} className="btn-primary text-xs">
                   Semua Sijil (1 PDF)
@@ -110,7 +110,7 @@ export default async function EventDetail({ params }: { params: Promise<{ id: st
             attendees={attendees}
             fields={fields}
             nameKey={nameField?.key ?? null}
-            hasTemplate={!!event.template_id}
+            hasTemplate={!!event.requires_certificate && !!event.template_id}
           />
         )}
       </section>

@@ -3,6 +3,7 @@
 import { useMemo, useState, useTransition } from "react";
 import type { Attendee, FormField } from "@/lib/types";
 import { deleteAttendee, updateAttendeeName } from "../../actions";
+import { formatFormValue } from "@/lib/form-submission";
 
 export default function AttendeeTable({
   eventId,
@@ -29,7 +30,7 @@ export default function AttendeeTable({
     return attendees.filter(
       (a) =>
         a.name_value.toLowerCase().includes(q) ||
-        fields.some((f) => (a.data?.[f.key] ?? "").toLowerCase().includes(q)),
+        fields.some((f) => formatFormValue(a.data?.[f.key]).toLowerCase().includes(q)),
     );
   }, [attendees, fields, query]);
 
@@ -110,7 +111,7 @@ export default function AttendeeTable({
                             }}
                           />
                         ) : (
-                          a.data?.[f.key] ?? ""
+                          formatFormValue(a.data?.[f.key])
                         )}
                       </td>
                     ))}

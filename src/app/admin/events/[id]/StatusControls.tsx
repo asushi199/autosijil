@@ -15,16 +15,18 @@ export default function StatusControls({
   eventId,
   current,
   hasTemplate,
+  requiresCertificate,
 }: {
   eventId: string;
   current: EventStatus;
   hasTemplate: boolean;
+  requiresCertificate: boolean;
 }) {
   const [pending, startTransition] = useTransition();
 
   return (
     <div className="space-y-2">
-      {STEPS.map((s) => {
+      {STEPS.filter((s) => requiresCertificate || s.status !== "released").map((s) => {
         const active = s.status === current;
         const disabled =
           pending || active || (s.status === "released" && !hasTemplate);

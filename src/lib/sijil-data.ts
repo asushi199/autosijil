@@ -2,6 +2,7 @@ import "server-only";
 import { adminClient } from "./supabase/admin";
 import { formatTarikh, type SijilValues } from "./pdf";
 import type { Attendee, EventRow, FormField, Template } from "./types";
+import { mappedSlotValues } from "./certificate-mapping";
 
 /** Muat program + templat + imej latar untuk penjanaan sijil. */
 export async function loadSijilContext(event: EventRow) {
@@ -25,15 +26,18 @@ export async function loadSijilContext(event: EventRow) {
   return { template, bgBytes };
 }
 
-export function attendeeValues(event: EventRow, attendee: Attendee): SijilValues {
+export function attendeeValues(event: EventRow, attendee: Attendee, template?: Template): SijilValues {
   // Sekolah bukan lajur khas — dibaca daripada jawapan borang mengikut medan role 'school'.
   const schoolField = (event.form_fields ?? []).find((f) => f.role === "school");
+  const schoolValue = schoolField ? attendee.data?.[schoolField.key] : undefined;
   return {
     name: attendee.name_value,
     ic: attendee.ic_value ?? undefined,
-    school: schoolField ? (attendee.data?.[schoolField.key] ?? undefined) : undefined,
+    school: typeof schoolValue === "string" ? schoolValue : undefined,
     eventName: event.title,
     eventDate: formatTarikh(event.event_date),
+    eventLocation: event.location ?? "",
+    slots: template ? mappedSlotValues(template, event.certificate_field_mappings ?? {}, attendee.data) : {},
   };
 }
 

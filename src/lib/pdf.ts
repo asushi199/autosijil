@@ -28,6 +28,8 @@ export interface SijilValues {
   school?: string;
   eventName: string;
   eventDate: string;
+  eventLocation?: string;
+  slots?: Record<string, string>;
 }
 
 function resolveText(el: TemplateElement, v: SijilValues): string {
@@ -43,6 +45,10 @@ function resolveText(el: TemplateElement, v: SijilValues): string {
       return v.eventName;
     case "event_date":
       return v.eventDate;
+    case "event_location":
+      return v.eventLocation ?? "";
+    case "participant_slot":
+      return v.slots?.[el.slotId ?? ""] ?? "";
     case "static":
       return el.text ?? "";
   }

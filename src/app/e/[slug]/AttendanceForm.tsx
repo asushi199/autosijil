@@ -1,17 +1,36 @@
 "use client";
 
 import { useState } from "react";
-import type { FormField } from "@/lib/types";
+import type { AttendeeData, FormField, FormValue } from "@/lib/types";
 
-export default function AttendanceForm({ slug, fields }: { slug: string; fields: FormField[] }) {
+export default function AttendanceForm({
+  slug,
+  fields,
+  isRegistration = false,
+}: {
+  slug: string;
+  fields: FormField[];
+  isRegistration?: boolean;
+}) {
   const nameKey = fields.find((f) => f.role === "name")?.key;
-  const [values, setValues] = useState<Record<string, string>>({});
+  const [values, setValues] = useState<AttendeeData>({});
   const [submitting, setSubmitting] = useState(false);
   const [done, setDone] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  function setValue(key: string, v: string) {
+  function setValue(key: string, v: FormValue) {
     setValues((s) => ({ ...s, [key]: v }));
+  }
+
+  function stringValue(key: string) {
+    const value = values[key];
+    return typeof value === "string" ? value : "";
+  }
+
+  function toggleChoice(key: string, option: string) {
+    const current = values[key];
+    const selected = Array.isArray(current) ? current : [];
+    setValue(key, selected.includes(option) ? selected.filter((item) => item !== option) : [...selected, option]);
   }
 
   async function handleSubmit(e: React.FormEvent) {
@@ -38,11 +57,13 @@ export default function AttendanceForm({ slug, fields }: { slug: string; fields:
   }
 
   if (done) {
-    const submittedName = nameKey ? (values[nameKey] ?? "").trim() : "";
+    const submittedName = nameKey ? stringValue(nameKey).trim() : "";
     return (
       <div className="card text-center">
         <div className="mb-2 text-3xl">✅</div>
-        <p className="font-medium">Terima kasih! Kehadiran anda telah direkodkan.</p>
+        <p className="font-medium">
+          Terima kasih! {isRegistration ? "Pendaftaran" : "Kehadiran"} anda telah direkodkan.
+        </p>
         {submittedName && (
           <p className="mt-3 rounded-lg bg-gray-50 px-3 py-2 text-sm text-gray-700">
             Nama untuk sijil: <b>{submittedName}</b>
@@ -52,10 +73,12 @@ export default function AttendanceForm({ slug, fields }: { slug: string; fields:
           Semak ejaan nama di atas — nama inilah yang akan dicetak pada sijil. Jika silap,
           sila maklumkan kepada urus setia program.
         </p>
-        <p className="mt-2 text-sm text-gray-500">
-          Sijil penyertaan boleh dimuat turun <b>di pautan yang sama</b> selepas dibuka oleh
-          urus setia program.
-        </p>
+        {!isRegistration && (
+          <p className="mt-2 text-sm text-gray-500">
+            Sijil penyertaan boleh dimuat turun <b>di pautan yang sama</b> selepas dibuka oleh
+            urus setia program.
+          </p>
+        )}
       </div>
     );
   }
@@ -72,7 +95,7 @@ export default function AttendanceForm({ slug, fields }: { slug: string; fields:
             <input
               className="input"
               required={f.required}
-              value={values[f.key] ?? ""}
+              value={stringValue(f.key)}
               onChange={(e) => setValue(f.key, e.target.value)}
             />
           )}
@@ -80,7 +103,7 @@ export default function AttendanceForm({ slug, fields }: { slug: string; fields:
             <select
               className="input"
               required={f.required}
-              value={values[f.key] ?? ""}
+              value={stringValue(f.key)}
               onChange={(e) => setValue(f.key, e.target.value)}
             >
               <option value="">— Pilih —</option>
@@ -97,7 +120,7 @@ export default function AttendanceForm({ slug, fields }: { slug: string; fields:
                     type="radio"
                     name={f.key}
                     required={f.required}
-                    checked={values[f.key] === o}
+                    checked={stringValue(f.key) === o}
                     onChange={() => setValue(f.key, o)}
                   />
                   {o}
@@ -109,11 +132,58 @@ export default function AttendanceForm({ slug, fields }: { slug: string; fields:
             <label className="flex items-center gap-2 text-sm">
               <input
                 type="checkbox"
-                checked={values[f.key] === "Ya"}
+                checked={stringValue(f.key) === "Ya"}
                 onChange={(e) => setValue(f.key, e.target.checked ? "Ya" : "")}
               />
               Ya
             </label>
+          )}
+          {f.type === "textarea" && (
+            <textarea
+              className="input"
+              rows={4}
+              required={f.required}
+              value={stringValue(f.key)}
+              onChange={(e) => setValue(f.key, e.target.value)}
+            />
+          )}
+          {f.type === "date" && (
+            <input
+              type="date"
+              className="input"
+              required={f.required}
+              value={stringValue(f.key)}
+              onChange={(e) => setValue(f.key, e.target.value)}
+            />
+          )}
+          {f.type === "ic" && (
+            <input
+              inputMode="numeric"
+              pattern="[0-9]{12}"
+              maxLength={12}
+              className="input"
+              required={f.required}
+              value={stringValue(f.key)}
+              onChange={(e) => setValue(f.key, e.target.value.replace(/\D/g, ""))}
+            />
+          )}
+          {f.type === "checkboxes" && (
+            <div className="space-y-1.5">
+              {(f.options ?? []).map((option) => {
+                const current = values[f.key];
+                const selected = Array.isArray(current) ? current : [];
+                return (
+                  <label key={option} className="flex items-center gap-2 text-sm">
+                    <input
+                      type="checkbox"
+                      checked={selected.includes(option)}
+                      onChange={() => toggleChoice(f.key, option)}
+                    />
+                    {option}
+                  </label>
+                );
+              })}
+            </div>
           )}
         </div>
       ))}

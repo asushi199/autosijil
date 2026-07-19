@@ -1,4 +1,7 @@
-export type FieldType = "text" | "select" | "radio" | "checkbox";
+export type FieldType = "text" | "textarea" | "select" | "radio" | "checkbox" | "checkboxes" | "date" | "ic";
+
+export type FormValue = string | string[];
+export type AttendeeData = Record<string, FormValue>;
 
 export interface FormField {
   key: string;
@@ -6,6 +9,8 @@ export interface FormField {
   type: FieldType;
   required: boolean;
   options?: string[];
+  /** Medan nilai tunggal yang boleh dipetakan kepada slot templat sijil. */
+  certificateEligible?: boolean;
   /**
    * 'name' = dicetak pada sijil & digunakan untuk semakan; 'ic' = pilihan tambahan
    * untuk semakan; 'school' = nama sekolah/unit yang boleh dicetak pada sijil.
@@ -13,7 +18,15 @@ export interface FormField {
   role?: "name" | "ic" | "school";
 }
 
-export type ElementSource = "name" | "ic" | "school" | "event_name" | "event_date" | "static";
+export type ElementSource =
+  | "name"
+  | "ic"
+  | "school"
+  | "event_name"
+  | "event_date"
+  | "event_location"
+  | "participant_slot"
+  | "static";
 
 export type FontId =
   | "helvetica"
@@ -32,6 +45,10 @@ export interface TemplateElement {
   source: ElementSource;
   /** teks tetap apabila source === 'static' */
   text?: string;
+  /** ID stabil untuk source === 'participant_slot'. */
+  slotId?: string;
+  /** Label pentadbir untuk source === 'participant_slot'. */
+  slotLabel?: string;
   /** kedudukan sebagai pecahan (0–1) daripada lebar/tinggi halaman; titik rujukan = tengah menegak teks */
   x: number;
   y: number;
@@ -88,13 +105,15 @@ export interface EventRow {
   status: EventStatus;
   form_fields: FormField[];
   template_id: string | null;
+  requires_certificate: boolean;
+  certificate_field_mappings: Record<string, string>;
   created_at: string;
 }
 
 export interface Attendee {
   id: string;
   event_id: string;
-  data: Record<string, string>;
+  data: AttendeeData;
   name_value: string;
   ic_value: string | null;
   created_at: string;

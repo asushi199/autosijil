@@ -28,7 +28,7 @@ export async function GET(_req: Request, ctx: { params: Promise<{ id: string }> 
   const pdf = await generateCombinedSijil(
     sijilCtx.template,
     sijilCtx.bgBytes,
-    attendees.map((a) => attendeeValues(event, a)),
+    attendees.map((a) => attendeeValues(event, a, sijilCtx.template)),
   );
 
   return new NextResponse(Buffer.from(pdf), {

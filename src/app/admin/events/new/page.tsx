@@ -20,6 +20,10 @@ export default function NewEventPage() {
             <input id="location" name="location" className="input" placeholder="cth. PPD Manjung" />
           </div>
         </div>
+        <label className="flex items-center gap-2 text-sm">
+          <input type="checkbox" name="requires_certificate" defaultChecked />
+          Perlu sijil untuk peserta
+        </label>
         <p className="text-xs text-gray-500">
           Selepas dicipta, anda boleh menyesuaikan medan borang kehadiran dan memilih templat sijil.
         </p>

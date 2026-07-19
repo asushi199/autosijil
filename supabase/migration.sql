@@ -60,3 +60,9 @@ alter table public.attendees enable row level security;
 insert into storage.buckets (id, name, public)
 values ('templates', 'templates', true)
 on conflict (id) do nothing;
+
+-- ============ Borang fleksibel & sijil boleh guna semula ============
+
+alter table public.events
+  add column if not exists requires_certificate boolean not null default true,
+  add column if not exists certificate_field_mappings jsonb not null default '{}'::jsonb;

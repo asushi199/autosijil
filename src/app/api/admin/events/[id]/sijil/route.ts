@@ -29,7 +29,7 @@ export async function GET(req: NextRequest, ctx: { params: Promise<{ id: string 
   const sijilCtx = await loadSijilContext(event);
   if ("error" in sijilCtx) return NextResponse.json({ error: sijilCtx.error }, { status: 400 });
 
-  const pdf = await generateSijil(sijilCtx.template, sijilCtx.bgBytes, attendeeValues(event, attendee));
+  const pdf = await generateSijil(sijilCtx.template, sijilCtx.bgBytes, attendeeValues(event, attendee, sijilCtx.template));
   return new NextResponse(Buffer.from(pdf), {
     headers: {
       "Content-Type": "application/pdf",

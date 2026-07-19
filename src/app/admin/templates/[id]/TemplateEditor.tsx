@@ -36,6 +36,8 @@ const SOURCE_LABEL: Record<ElementSource, string> = {
   school: "Nama Sekolah / Unit",
   event_name: "Nama Program",
   event_date: "Tarikh Program",
+  event_location: "Tempat Program",
+  participant_slot: "Slot Maklumat Peserta",
   static: "Teks Statik",
 };
 
@@ -45,10 +47,13 @@ const SAMPLE: Record<Exclude<ElementSource, "static">, string> = {
   school: "Sekolah Kebangsaan Seri Manjung",
   event_name: "WORK COE: Penataran Modul Pendigitalan Google, Canva dan AI",
   event_date: "8 Julai 2026",
+  event_location: "Dewan PPD Manjung",
+  participant_slot: "Maklumat peserta",
 };
 
 function previewText(el: TemplateElement): string {
   if (el.source === "static") return el.text || "Teks…";
+  if (el.source === "participant_slot") return el.slotLabel || SAMPLE.participant_slot;
   // Nama dipaparkan huruf besar (sama seperti cetakan sijil)
   if (el.source === "name") return nameForPrint(SAMPLE.name);
   return SAMPLE[el.source];
@@ -135,6 +140,8 @@ export default function TemplateEditor({ template }: { template: Template }) {
       id: newId(),
       source,
       text: source === "static" ? "Teks baharu" : undefined,
+      slotId: source === "participant_slot" ? `slot_${newId()}` : undefined,
+      slotLabel: source === "participant_slot" ? "Maklumat peserta" : undefined,
       x: 0.5,
       y: 0.5,
       size: source === "name" ? 32 : 16,
@@ -450,6 +457,16 @@ export default function TemplateEditor({ template }: { template: Template }) {
                     className="input"
                     value={selected.text ?? ""}
                     onChange={(e) => patch(selected.id, { text: e.target.value })}
+                  />
+                </div>
+              )}
+              {selected.source === "participant_slot" && (
+                <div>
+                  <label className="label">Label slot</label>
+                  <input
+                    className="input"
+                    value={selected.slotLabel ?? ""}
+                    onChange={(e) => patch(selected.id, { slotLabel: e.target.value })}
                   />
                 </div>
               )}

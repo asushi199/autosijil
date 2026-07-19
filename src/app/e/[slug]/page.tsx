@@ -26,7 +26,7 @@ export default async function PublicEventPage({
   const db = adminClient();
   const { data: event } = await db
     .from("events")
-    .select("id, slug, title, description, event_date, location, status, form_fields")
+    .select("id, slug, title, description, event_date, location, status, form_fields, requires_certificate")
     .eq("slug", slug)
     .single<Omit<EventRow, "template_id" | "created_at">>();
 
@@ -50,7 +50,8 @@ export default async function PublicEventPage({
       <Shell title={event.title}>
         {meta}
         {event.description && <p className="mb-4 text-sm text-gray-600">{event.description}</p>}
-        <AttendanceForm slug={event.slug} fields={event.form_fields ?? []} />
+        {!event.requires_certificate && <p className="mb-3 text-sm font-medium text-blue-800">Borang Pendaftaran</p>}
+        <AttendanceForm slug={event.slug} fields={event.form_fields ?? []} isRegistration={!event.requires_certificate} />
       </Shell>
     );
   }
@@ -61,9 +62,9 @@ export default async function PublicEventPage({
         {meta}
         <div className="card text-center text-gray-600">
           Pendaftaran kehadiran telah <b>ditutup</b>.
-          <p className="mt-2 text-sm text-gray-500">
+          {event.requires_certificate && <p className="mt-2 text-sm text-gray-500">
             Sijil akan boleh dimuat turun di pautan ini selepas dibuka oleh urus setia.
-          </p>
+          </p>}
         </div>
       </Shell>
     );

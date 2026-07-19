@@ -10,14 +10,14 @@ export default async function EditEventPage({ params }: { params: Promise<{ id: 
   const db = adminClient();
   const [{ data: event }, { data: templates }] = await Promise.all([
     db.from("events").select("*").eq("id", id).single<EventRow>(),
-    db.from("templates").select("id, name, orientation").order("created_at", { ascending: false }),
+    db.from("templates").select("id, name, orientation, elements").order("created_at", { ascending: false }),
   ]);
   if (!event) notFound();
 
   return (
     <EventEditor
       event={event}
-      templates={(templates ?? []) as Pick<Template, "id" | "name" | "orientation">[]}
+      templates={(templates ?? []) as Pick<Template, "id" | "name" | "orientation" | "elements">[]}
     />
   );
 }
