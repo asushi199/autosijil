@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { updateEvent } from "../../../actions";
 import type { EventRow, FieldType, FormField, Template } from "@/lib/types";
 import { getTemplateSlots } from "@/lib/certificate-mapping";
+import { normalizeFormFieldsForSave, parseOptionsWhileEditing } from "@/lib/form-fields";
 
 let counter = 0;
 function newKey() {
@@ -74,7 +75,7 @@ export default function EventEditor({
         description: description.trim() || null,
         event_date: eventDate || null,
         location: location.trim() || null,
-        form_fields: fields,
+        form_fields: normalizeFormFieldsForSave(fields),
         template_id: templateId || null,
         requires_certificate: requiresCertificate,
         certificate_field_mappings: mappings,
@@ -246,7 +247,7 @@ export default function EventEditor({
                 value={(f.options ?? []).join(", ")}
                 onChange={(e) =>
                   patchField(i, {
-                    options: e.target.value.split(",").map((s) => s.trim()).filter(Boolean),
+                    options: parseOptionsWhileEditing(e.target.value),
                   })
                 }
               />
