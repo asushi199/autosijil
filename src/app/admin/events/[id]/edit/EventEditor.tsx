@@ -4,7 +4,7 @@ import { useState, useTransition } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { updateEvent } from "../../../actions";
-import type { EventRow, FieldType, FormField, Template } from "@/lib/types";
+import type { CertificateFieldRole, EventRow, FieldType, FormField, Template } from "@/lib/types";
 import { getTemplateSlots } from "@/lib/certificate-mapping";
 import { normalizeFormFieldsForSave, parseOptionsWhileEditing } from "@/lib/form-fields";
 
@@ -48,8 +48,8 @@ export default function EventEditor({
     setFields((fs) => fs.map((f, j) => (j === i ? { ...f, ...patch } : f)));
   }
 
-  function setRole(i: number, role: "name" | "ic" | "school") {
-    // Setiap role (name/ic/school) unik — hanya satu medan boleh memegangnya.
+  function setRole(i: number, role: CertificateFieldRole) {
+    // Setiap peranan aktif unik — hanya satu medan boleh memegangnya.
     setFields((fs) =>
       fs.map((f, j) => {
         if (j === i) return { ...f, role: f.role === role ? undefined : role };
@@ -181,8 +181,8 @@ export default function EventEditor({
             <p className="text-xs text-gray-500">
               Tandakan satu medan sebagai <b>Nama</b> — nilai medan itu dicetak pada sijil dan
               digunakan untuk semakan. Medan <b>IC</b> adalah pilihan (memudahkan semakan sijil).
-              Tandakan medan <b>Sekolah / Unit</b> jika anda mahu ia boleh dicetak pada sijil
-              (tambah elemen “Nama Sekolah / Unit” dalam templat).
+              Untuk Sekolah/Unit, jawatan, kumpulan atau lokasi, tandakan <b>Sedia untuk pemetaan sijil</b>
+              kemudian padankan medan itu dengan Slot Maklumat Peserta dalam templat.
             </p>
           </div>
           <button
@@ -260,7 +260,7 @@ export default function EventEditor({
                   checked={!!f.certificateEligible}
                   onChange={(e) => patchField(i, { certificateEligible: e.target.checked })}
                 />
-                Boleh dicetak pada sijil
+                Sedia untuk pemetaan sijil
               </label>
             )}
             <div className="flex gap-3 text-sm">
@@ -278,12 +278,6 @@ export default function EventEditor({
                   </span>
                 </label>
               )}
-              <label className="flex items-center gap-1.5">
-                <input type="checkbox" checked={f.role === "school"} onChange={() => setRole(i, "school")} />
-                <span className={f.role === "school" ? "font-medium text-blue-700" : "text-gray-600"}>
-                  Sekolah / Unit (boleh dicetak pada sijil)
-                </span>
-              </label>
             </div>
           </div>
         ))}

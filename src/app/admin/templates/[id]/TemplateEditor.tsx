@@ -9,6 +9,7 @@ import {
   FIT_LABEL,
   FONT_LABEL,
   pageSize,
+  TEMPLATE_SOURCES_FOR_NEW_ELEMENTS,
   withElementDefaults,
   type ElementSource,
   type FitMode,
@@ -426,7 +427,7 @@ export default function TemplateEditor({ template }: { template: Template }) {
           <section className="card space-y-2">
             <h2 className="text-sm font-medium">Tambah Elemen Teks</h2>
             <div className="flex flex-wrap gap-1.5">
-              {(Object.keys(SOURCE_LABEL) as ElementSource[]).map((s) => (
+              {TEMPLATE_SOURCES_FOR_NEW_ELEMENTS.map((s) => (
                 <button key={s} className="btn-secondary px-2.5 py-1 text-xs" onClick={() => addElement(s)}>
                   + {SOURCE_LABEL[s]}
                 </button>

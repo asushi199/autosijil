@@ -13,7 +13,7 @@ export interface FormField {
   certificateEligible?: boolean;
   /**
    * 'name' = dicetak pada sijil & digunakan untuk semakan; 'ic' = pilihan tambahan
-   * untuk semakan; 'school' = nama sekolah/unit yang boleh dicetak pada sijil.
+   * untuk semakan; 'school' hanya untuk keserasian Program/templat lama.
    */
   role?: "name" | "ic" | "school";
 }
@@ -27,6 +27,21 @@ export type ElementSource =
   | "event_location"
   | "participant_slot"
   | "static";
+
+/** Peranan yang boleh dipilih apabila mencipta atau menyunting medan baharu. */
+export const CERTIFICATE_FIELD_ROLE_OPTIONS = ["name", "ic"] as const;
+export type CertificateFieldRole = (typeof CERTIFICATE_FIELD_ROLE_OPTIONS)[number];
+
+/** Sumber yang boleh ditambah pada templat baharu. `school` dikekalkan untuk templat lama sahaja. */
+export const TEMPLATE_SOURCES_FOR_NEW_ELEMENTS = [
+  "name",
+  "ic",
+  "event_name",
+  "event_date",
+  "event_location",
+  "participant_slot",
+  "static",
+] as const satisfies readonly ElementSource[];
 
 export type FontId =
   | "helvetica"
