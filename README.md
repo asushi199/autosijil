@@ -67,6 +67,8 @@ Pada penyunting Program, tambah medan **Direktori Sekolah** untuk memaparkan pil
 jadual admin, CSV dan sijil. Tambah **Unit / Bahagian** sebagai medan teks atau pilihan
 berasingan jika Program memerlukannya.
 
+Pilihan sekolah disusun mengikut kod sekolah dan boleh dicari melalui kod atau nama sekolah.
+
 Untuk import atau kemas kini fail CSV sekolah selepas menjalankan migrasi terkini:
 
 ```bash

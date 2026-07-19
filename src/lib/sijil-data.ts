@@ -25,7 +25,7 @@ export async function loadSijilContext(event: EventRow) {
     bgBytes = new Uint8Array(await blob.arrayBuffer());
   }
   const schools: SchoolDirectoryEntry[] = (event.form_fields ?? []).some((field) => field.type === "school")
-    ? ((await db.from("school_directory").select("code, name, zone").order("name")).data ?? []) as SchoolDirectoryEntry[]
+    ? ((await db.from("school_directory").select("code, name, zone").order("code")).data ?? []) as SchoolDirectoryEntry[]
     : [];
   return { template, bgBytes, schools };
 }

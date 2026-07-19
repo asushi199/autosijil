@@ -23,7 +23,7 @@ export async function GET(_req: Request, ctx: { params: Promise<{ id: string }> 
 
   const fields = event.form_fields ?? [];
   const schools: SchoolDirectoryEntry[] = fields.some((field) => field.type === "school")
-    ? ((await db.from("school_directory").select("code, name, zone").order("name")).data ?? []) as SchoolDirectoryEntry[]
+    ? ((await db.from("school_directory").select("code, name, zone").order("code")).data ?? []) as SchoolDirectoryEntry[]
     : [];
   const header = ["Bil", ...fields.map((f) => f.label), "Masa Daftar"];
   const rows = (attendees ?? []).map((a, i) => [

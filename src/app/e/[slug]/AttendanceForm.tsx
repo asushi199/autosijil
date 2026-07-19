@@ -2,7 +2,8 @@
 
 import { useState } from "react";
 import type { AttendeeData, FormField, FormValue } from "@/lib/types";
-import { schoolOptionLabel, type SchoolDirectoryEntry } from "@/lib/school-directory";
+import type { SchoolDirectoryEntry } from "@/lib/school-directory";
+import SchoolPicker from "./SchoolPicker";
 
 export default function AttendanceForm({
   slug,
@@ -103,17 +104,12 @@ export default function AttendanceForm({
             />
           )}
           {f.type === "school" && (
-            <select
-              className="input"
-              required={f.required}
+            <SchoolPicker
               value={stringValue(f.key)}
-              onChange={(e) => setValue(f.key, e.target.value)}
-            >
-              <option value="">— Pilih sekolah —</option>
-              {schools.map((school) => (
-                <option key={school.code} value={school.code}>{schoolOptionLabel(school)}</option>
-              ))}
-            </select>
+              schools={schools}
+              required={f.required}
+              onChange={(code) => setValue(f.key, code)}
+            />
           )}
           {f.type === "select" && (
             <select

@@ -2,6 +2,17 @@
 
 Log keputusan dan konteks penting untuk sesi AI akan datang. Tambah entri terbaru di atas.
 
+## 2026-07-19 — Pencari Direktori Sekolah
+
+- **Keperluan pengguna**: pilihan sekolah perlu disusun mengikut kod dan boleh dicari melalui
+  kod atau nama supaya 102 rekod mudah dipilih pada telefon.
+- **Keputusan**: gantikan `<select>` sekolah dengan pencari klien yang menapis kod/nama tanpa
+  peka huruf besar/kecil. Nilai yang dihantar kekal kod sekolah; semua query direktori kini
+  disusun mengikut `code` menaik.
+- **Lokasi berbilang tempat**: gunakan medan pilihan `Tempat Kursus / Lokasi` pada Program,
+  tandakan boleh dicetak pada sijil, dan petakan ke `participant slot` templat. Ini kekal
+  berasingan daripada lokasi Program tetap.
+
 ## 2026-07-19 — Direktori Sekolah Manjung boleh guna semula
 
 - **Keperluan pengguna**: simpan nama dan kod sekolah Manjung untuk guna semula dalam borang

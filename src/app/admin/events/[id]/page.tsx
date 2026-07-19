@@ -19,7 +19,7 @@ export default async function EventDetail({ params }: { params: Promise<{ id: st
   if (!event) notFound();
   const fields = event.form_fields ?? [];
   const schools: SchoolDirectoryEntry[] = fields.some((field) => field.type === "school")
-    ? ((await db.from("school_directory").select("code, name, zone").order("name")).data ?? []) as SchoolDirectoryEntry[]
+    ? ((await db.from("school_directory").select("code, name, zone").order("code")).data ?? []) as SchoolDirectoryEntry[]
     : [];
 
   const { data: attendees } = await db
