@@ -2,6 +2,19 @@
 
 Log keputusan dan konteks penting untuk sesi AI akan datang. Tambah entri terbaru di atas.
 
+## 2026-07-19 — Direktori Sekolah Manjung boleh guna semula
+
+- **Keperluan pengguna**: simpan nama dan kod sekolah Manjung untuk guna semula dalam borang
+  Program, dengan paparan `KOD — NAMA`; Unit perlu kekal fleksibel.
+- **Keputusan**: jadual `school_directory` ialah sumber tunggal (code, name, zone,
+  source_updated_at) dengan RLS. Jenis medan `school` menyimpan kod sahaja; borang, jadual
+  admin, CSV dan sijil menukarnya kepada `KOD — NAMA`. Route kehadiran mengesahkan kod di
+  pelayan.
+- **Sekolah + Unit**: tambah **Direktori Sekolah** dan medan teks / pilihan berasingan
+  **Unit / Bahagian**. Jangan masukkan Unit sementara ke dalam direktori sekolah.
+- **Import**: `scripts/import-school-directory.mjs` melakukan upsert mengikut `code`.
+  Pada 2026-07-19, fail sumber telah diimport dan Supabase mengesahkan **102** rekod.
+
 ## 2026-07-17 — Elemen "Nama Sekolah / Unit" pada sijil
 
 - **Keperluan pengguna**: sediakan elemen nama sekolah pada templat sijil untuk kegunaan

@@ -60,6 +60,22 @@ Satu kata laluan sahaja dikongsi oleh pasukan — tiada akaun individu untuk diu
   tekan **Buka Kehadiran** → edarkan QR.
 - **Status program**: Draf → Buka Kehadiran → Tutup Kehadiran → Buka Muat Turun Sijil.
 
+### Direktori Sekolah
+
+Pada penyunting Program, tambah medan **Direktori Sekolah** untuk memaparkan pilihan seperti
+`ABA1001 — SK DENDANG`. Sistem menyimpan kod sekolah tetapi memaparkan kod dan nama pada
+jadual admin, CSV dan sijil. Tambah **Unit / Bahagian** sebagai medan teks atau pilihan
+berasingan jika Program memerlukannya.
+
+Untuk import atau kemas kini fail CSV sekolah selepas menjalankan migrasi terkini:
+
+```bash
+node --env-file=.env.local scripts/import-school-directory.mjs "C:\laluan\direktori-sekolah.csv"
+```
+
+Import menggunakan kod sekolah sebagai kunci, jadi fail baharu boleh diimport semula tanpa
+rekod pendua.
+
 ## Nota teknikal
 
 - Sijil dijana atas permintaan (on-demand) dengan `pdf-lib`; tiada PDF disimpan.
