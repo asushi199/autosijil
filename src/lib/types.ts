@@ -1,4 +1,4 @@
-export type FieldType = "text" | "textarea" | "select" | "radio" | "checkbox" | "checkboxes" | "date" | "ic";
+export type FieldType = "text" | "textarea" | "select" | "radio" | "checkbox" | "checkboxes" | "date" | "ic" | "school";
 
 export type FormValue = string | string[];
 export type AttendeeData = Record<string, FormValue>;
