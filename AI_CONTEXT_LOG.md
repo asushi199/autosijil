@@ -2,6 +2,11 @@
 
 Log keputusan dan konteks penting untuk sesi AI akan datang. Tambah entri terbaru di atas.
 
+## 2026-07-22 — Auto-skrol hasil semakan sijil pada mudah alih
+
+- **Keperluan pengguna**: apabila peserta menaip nama untuk menyemak sijil, hasil carian tidak boleh terlindung oleh papan kekunci telefon.
+- **Keputusan**: `SemakSijil.tsx` kini menatal hasil ke tengah paparan secara lancar apabila cadangan nama, mesej ralat, atau sijil yang ditemui dipaparkan. Sasaran khusus bagi setiap jenis hasil memastikan nama atau butang muat turun terus kelihatan.
+
 ## 2026-07-19 — Carian sijil masa nyata
 
 - **Keperluan pengguna**: peserta boleh mencari sijil sendiri dengan carian nama kabur dan

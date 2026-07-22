@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 interface Match {
   id: string;
@@ -15,6 +15,9 @@ export default function SemakSijil({ slug }: { slug: string }) {
   const [suggestions, setSuggestions] = useState<string[]>([]);
   const [match, setMatch] = useState<Match | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const suggestionsRef = useRef<HTMLDivElement>(null);
+  const errorRef = useRef<HTMLParagraphElement>(null);
+  const matchRef = useRef<HTMLDivElement>(null);
 
   async function checkCertificate(name: string) {
     setError(null);
@@ -70,6 +73,21 @@ export default function SemakSijil({ slug }: { slug: string }) {
     };
   }, [query, slug]);
 
+  useEffect(() => {
+    let target: HTMLElement | null = null;
+    if (match) target = matchRef.current;
+    else if (error) target = errorRef.current;
+    else if (suggestions.length) target = suggestionsRef.current;
+
+    if (!target) return;
+
+    const frame = window.requestAnimationFrame(() => {
+      target.scrollIntoView({ behavior: "smooth", block: "center" });
+    });
+
+    return () => window.cancelAnimationFrame(frame);
+  }, [error, match, suggestions]);
+
   return (
     <div className="space-y-4">
       <div className="card space-y-4">
@@ -102,7 +120,10 @@ export default function SemakSijil({ slug }: { slug: string }) {
         </form>
         {suggesting && <p className="text-xs text-gray-500">Mencari nama…</p>}
         {!!suggestions.length && (
-          <div className="rounded-lg border border-gray-200 bg-white p-1">
+          <div
+            ref={suggestionsRef}
+            className="scroll-mt-4 rounded-lg border border-gray-200 bg-white p-1"
+          >
             <p className="px-2 py-1 text-xs text-gray-500">Pilih nama anda</p>
             {suggestions.map((name) => (
               <button
@@ -120,11 +141,15 @@ export default function SemakSijil({ slug }: { slug: string }) {
             ))}
           </div>
         )}
-        {error && <p className="text-sm text-red-600">{error}</p>}
+        {error && (
+          <p ref={errorRef} className="scroll-mt-4 text-sm text-red-600">
+            {error}
+          </p>
+        )}
       </div>
 
       {match && (
-        <div className="card text-center">
+        <div ref={matchRef} className="card scroll-mt-4 text-center">
           <p className="text-sm text-gray-500">Sijil ditemui untuk</p>
           <p className="mb-3 font-medium">{match.name}</p>
           <a
