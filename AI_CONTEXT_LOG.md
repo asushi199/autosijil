@@ -9,6 +9,8 @@ Log keputusan dan konteks penting untuk sesi AI akan datang. Tambah entri terbar
   Bearer `EUSTP_INTEGRATION_SECRET`. Event idempotent melalui
   `(external_source, external_booking_id)`. Status awal `open`; `requires_certificate`
   daripada eUSTP. SQL: `supabase/migrations/2026-08-04-eustp-external-booking.sql`.
+- **Fasa 2**: `PATCH /api/integrations/eustp/events` kemas kini title/date/location/description
+  mengikut `externalBookingId` apabila eUSTP ubah jadual.
 
 ## 2026-07-22 — Auto-skrol hasil semakan sijil pada mudah alih
 

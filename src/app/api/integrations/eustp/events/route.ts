@@ -131,3 +131,78 @@ export async function POST(req: Request) {
     ...links,
   });
 }
+
+type UpdateBody = {
+  externalBookingId?: string;
+  title?: string;
+  eventDate?: string | null;
+  location?: string | null;
+  description?: string | null;
+};
+
+export async function PATCH(req: Request) {
+  if (!assertEustpIntegrationAuth(req)) {
+    return NextResponse.json({ error: "Tidak dibenarkan" }, { status: 401 });
+  }
+
+  let body: UpdateBody;
+  try {
+    body = (await req.json()) as UpdateBody;
+  } catch {
+    return NextResponse.json({ error: "JSON tidak sah" }, { status: 400 });
+  }
+
+  const externalBookingId = String(body.externalBookingId ?? "").trim();
+  if (!externalBookingId) {
+    return NextResponse.json({ error: "externalBookingId diperlukan" }, { status: 400 });
+  }
+
+  const db = adminClient();
+  const { data: existing, error: findError } = await db
+    .from("events")
+    .select("id, slug")
+    .eq("external_source", "eustp")
+    .eq("external_booking_id", externalBookingId)
+    .maybeSingle();
+
+  if (findError) {
+    return NextResponse.json({ error: findError.message }, { status: 500 });
+  }
+  if (!existing) {
+    return NextResponse.json({ error: "Event tidak dijumpai" }, { status: 404 });
+  }
+
+  const patch: Record<string, string | null> = {};
+  if (body.title !== undefined) {
+    const title = String(body.title ?? "").trim();
+    if (!title) {
+      return NextResponse.json({ error: "title tidak boleh kosong" }, { status: 400 });
+    }
+    patch.title = title;
+  }
+  if (body.eventDate !== undefined) {
+    patch.event_date = body.eventDate ? String(body.eventDate).trim() || null : null;
+  }
+  if (body.location !== undefined) {
+    patch.location = body.location ? String(body.location).trim() || null : null;
+  }
+  if (body.description !== undefined) {
+    patch.description = body.description ? String(body.description).trim() || null : null;
+  }
+
+  if (Object.keys(patch).length === 0) {
+    return NextResponse.json({ error: "Tiada medan untuk dikemas kini" }, { status: 400 });
+  }
+
+  const { error: updateError } = await db.from("events").update(patch).eq("id", existing.id);
+  if (updateError) {
+    return NextResponse.json({ error: updateError.message }, { status: 500 });
+  }
+
+  const links = urlsFor(existing.id, existing.slug);
+  return NextResponse.json({
+    eventId: existing.id,
+    slug: existing.slug,
+    ...links,
+  });
+}
