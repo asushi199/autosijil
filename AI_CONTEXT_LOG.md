@@ -2,6 +2,14 @@
 
 Log keputusan dan konteks penting untuk sesi AI akan datang. Tambah entri terbaru di atas.
 
+## 2026-08-04 — Integrasi eUSTP (cipta event dari tempahan)
+
+- **Keperluan**: eUSTP auto-cipta Program kehadiran/sijil selepas tempahan diluluskan.
+- **Keputusan**: API peribadi `POST /api/integrations/eustp/events` (+ `/cancel`) dengan
+  Bearer `EUSTP_INTEGRATION_SECRET`. Event idempotent melalui
+  `(external_source, external_booking_id)`. Status awal `open`; `requires_certificate`
+  daripada eUSTP. SQL: `supabase/migrations/2026-08-04-eustp-external-booking.sql`.
+
 ## 2026-07-22 — Auto-skrol hasil semakan sijil pada mudah alih
 
 - **Keperluan pengguna**: apabila peserta menaip nama untuk menyemak sijil, hasil carian tidak boleh terlindung oleh papan kekunci telefon.
