@@ -2,6 +2,17 @@
 
 Log keputusan dan konteks penting untuk sesi AI akan datang. Tambah entri terbaru di atas.
 
+## 2026-08-08 — Baris manual nama program & teks statik
+
+- **Keperluan**: susun baris nama program pada sijil (banyak program kongsi satu templat);
+  Teks Statik juga perlu sokong Enter / baris kosong untuk ayat panjang ad hoc.
+- **Keputusan**: lajur `events.certificate_title` (nullable). PDF guna
+  `certificateEventName()` — nilai tersuai jika tidak kosong, else `title`. Edit di
+  halaman program (textarea 「Nama pada sijil」 + salin semula). Templat kekal dikongsi.
+  Teks Statik dalam `TemplateEditor` ditukar kepada `<textarea>`; `wrapLines` sudah hormati `\n`.
+- **SQL**: `supabase/migrations/2026-08-08-certificate-title.sql` (+ idempotent dalam
+  `migration.sql`).
+
 ## 2026-08-04 — Integrasi eUSTP (cipta event dari tempahan)
 
 - **Keperluan**: eUSTP auto-cipta Program kehadiran/sijil selepas tempahan diluluskan.

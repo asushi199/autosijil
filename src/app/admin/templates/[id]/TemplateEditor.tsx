@@ -454,11 +454,16 @@ export default function TemplateEditor({ template }: { template: Template }) {
               {selected.source === "static" && (
                 <div>
                   <label className="label">Teks</label>
-                  <input
+                  <textarea
                     className="input"
+                    rows={4}
                     value={selected.text ?? ""}
                     onChange={(e) => patch(selected.id, { text: e.target.value })}
+                    placeholder="Tekan Enter untuk baris baharu"
                   />
+                  <p className="mt-1 text-xs text-gray-500">
+                    Enter = baris baharu (termasuk baris kosong). Lebih sesuai dengan mod 「Balut」.
+                  </p>
                 </div>
               )}
               {selected.source === "participant_slot" && (

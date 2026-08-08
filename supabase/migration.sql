@@ -77,6 +77,10 @@ alter table public.events
   add column if not exists requires_certificate boolean not null default true,
   add column if not exists certificate_field_mappings jsonb not null default '{}'::jsonb;
 
+-- Nama program pada sijil (boleh ada baris baharu); null/kosong → guna title
+alter table public.events
+  add column if not exists certificate_title text;
+
 -- Integrasi eUSTP: pautan event ↔ booking luar (idempotent)
 alter table public.events
   add column if not exists external_source text,
