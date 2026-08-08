@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import { adminClient } from "@/lib/supabase/admin";
+import { certificateEventName } from "@/lib/certificate-title";
 import { formatTarikh } from "@/lib/pdf";
 import type { EventRow, Template, TemplatePreviewSamples } from "@/lib/types";
 import TemplateEditor from "./TemplateEditor";
@@ -19,18 +20,24 @@ export default async function TemplatePage({
   const { data: template } = await db.from("templates").select("*").eq("id", id).single<Template>();
   if (!template) notFound();
 
-  let previewEvent: (Pick<EventRow, "id" | "title"> & { samples: TemplatePreviewSamples }) | null =
-    null;
+  let previewEvent:
+    | (Pick<EventRow, "id" | "title"> & {
+        samples: TemplatePreviewSamples;
+        certificateTitle: string;
+      })
+    | null = null;
 
   if (eventId) {
     if (template.owner_event_id && template.owner_event_id !== eventId) notFound();
     const { data: event } = await db.from("events").select("*").eq("id", eventId).single<EventRow>();
     if (!event) notFound();
+    const certificateTitle = certificateEventName(event);
     previewEvent = {
       id: event.id,
       title: event.title,
+      certificateTitle,
       samples: {
-        event_name: event.title,
+        event_name: certificateTitle,
         event_date: formatTarikh(event.event_date),
         event_location: event.location ?? "",
       },

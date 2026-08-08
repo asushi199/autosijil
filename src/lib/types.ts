@@ -133,7 +133,10 @@ export interface EventRow {
   template_id: string | null;
   requires_certificate: boolean;
   certificate_field_mappings: Record<string, string>;
-  /** Nama program untuk dicetak pada sijil; boleh mengandungi \\n. Null/kosong → guna title. */
+  /**
+   * Susunan baris nama program pada sijil (boleh mengandungi \\n).
+   * Diedit dalam templat khas program; null/kosong → guna title.
+   */
   certificate_title: string | null;
   created_at: string;
 }

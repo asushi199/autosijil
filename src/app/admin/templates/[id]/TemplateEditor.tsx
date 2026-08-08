@@ -3,7 +3,13 @@
 import { useCallback, useEffect, useRef, useState, useTransition } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { deleteTemplate, duplicateTemplate, updateTemplate, uploadTemplateBg } from "../../actions";
+import {
+  deleteTemplate,
+  duplicateTemplate,
+  updateEventCertificateTitle,
+  updateTemplate,
+  uploadTemplateBg,
+} from "../../actions";
 import { templateBgUrl } from "@/lib/storage";
 import {
   FIT_LABEL,
@@ -93,12 +99,16 @@ export default function TemplateEditor({
   previewEvent?: {
     id: string;
     title: string;
+    certificateTitle: string;
     samples: TemplatePreviewSamples;
   } | null;
 }) {
   const router = useRouter();
   const [pending, startTransition] = useTransition();
   const [name, setName] = useState(template.name);
+  const [programNameLines, setProgramNameLines] = useState(
+    previewEvent?.certificateTitle ?? previewEvent?.title ?? "",
+  );
   const isProgramOwned = !!template.owner_event_id;
   const backHref = previewEvent
     ? `/admin/events/${previewEvent.id}/edit`
@@ -116,6 +126,9 @@ export default function TemplateEditor({
   const [uploading, setUploading] = useState(false);
   const [dirty, setDirty] = useState(false);
   const [guide, setGuide] = useState<{ v: boolean; h: boolean }>({ v: false, h: false });
+  const liveSamples: TemplatePreviewSamples | null = previewEvent
+    ? { ...previewEvent.samples, event_name: programNameLines || previewEvent.title }
+    : null;
 
   const canvasRef = useRef<HTMLDivElement>(null);
   const [canvasW, setCanvasW] = useState(700);
@@ -242,12 +255,20 @@ export default function TemplateEditor({
     setMsg(null);
     startTransition(async () => {
       const res = await updateTemplate(template.id, { name, orientation, elements });
-      if (res?.error) setMsg({ kind: "err", text: res.error });
-      else {
-        setMsg({ kind: "ok", text: "Disimpan." });
-        setDirty(false);
-        onDone?.();
+      if (res?.error) {
+        setMsg({ kind: "err", text: res.error });
+        return;
       }
+      if (previewEvent) {
+        const titleRes = await updateEventCertificateTitle(previewEvent.id, programNameLines);
+        if ("error" in titleRes) {
+          setMsg({ kind: "err", text: titleRes.error });
+          return;
+        }
+      }
+      setMsg({ kind: "ok", text: "Disimpan." });
+      setDirty(false);
+      onDone?.();
     });
   }
 
@@ -312,8 +333,8 @@ export default function TemplateEditor({
 
       {previewEvent && (
         <div className="rounded-xl border border-amber-200 bg-amber-50/80 px-3 py-2 text-xs text-amber-950">
-          <b>Templat khas program:</b> {previewEvent.title}. Perubahan fon, kotak dan teks statik di
-          sini hanya untuk program ini — tidak menjejaskan templat induk.
+          <b>Templat khas program:</b> {previewEvent.title}. Fon, kotak, teks statik dan susunan baris
+          nama program di sini hanya untuk program ini.
         </div>
       )}
 
@@ -346,7 +367,7 @@ export default function TemplateEditor({
 
             {elements.map((el) => {
               const active = el.id === selectedId;
-              const text = previewText(el, previewEvent?.samples);
+              const text = previewText(el, liveSamples);
               const family = FONT_CSS[el.font];
               const weight = fontWeight(el.font);
               const boxPx = clamp(el.boxWidth ?? 0.8, 0.1, 1) * canvasW;
@@ -465,6 +486,38 @@ export default function TemplateEditor({
               ))}
             </div>
           </section>
+
+          {previewEvent && (
+            <section className="card space-y-2">
+              <div className="flex items-center justify-between gap-2">
+                <h2 className="text-sm font-medium">Nama program pada sijil</h2>
+                <button
+                  type="button"
+                  className="text-xs text-blue-700 hover:underline"
+                  onClick={() => {
+                    setProgramNameLines(previewEvent.title);
+                    setDirty(true);
+                  }}
+                >
+                  Salin semula
+                </button>
+              </div>
+              <textarea
+                className="input font-mono text-sm"
+                rows={4}
+                value={programNameLines}
+                onChange={(e) => {
+                  setProgramNameLines(e.target.value);
+                  setDirty(true);
+                }}
+                placeholder="Tekan Enter untuk baris baharu / baris kosong"
+              />
+              <p className="text-xs text-gray-500">
+                Susun baris di sini — kanvas dikemas kini serta-merta. Tekan Simpan untuk kekal pada
+                sijil.
+              </p>
+            </section>
+          )}
 
           {selected ? (
             <section className="card space-y-3">

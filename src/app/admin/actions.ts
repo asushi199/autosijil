@@ -64,11 +64,7 @@ export async function updateEvent(id: string, payload: UpdateEventPayload) {
     return { error: "Tetapkan tepat satu medan sebagai 'Nama (dicetak pada sijil)'." };
   }
   const db = adminClient();
-  // Kosongkan certificate_title lama (UI telah diganti dengan templat khas program).
-  const { error } = await db
-    .from("events")
-    .update({ ...payload, certificate_title: null })
-    .eq("id", id);
+  const { error } = await db.from("events").update(payload).eq("id", id);
   if (error) return { error: error.message };
 
   // Buang templat khas program yang tidak lagi dipilih (elak orphan).
@@ -175,6 +171,23 @@ export async function customizeEventTemplate(
 
   revalidatePath(`/admin/events/${eventId}`);
   return { url: `/admin/templates/${created.id}?event=${eventId}` };
+}
+
+/** Susunan baris nama program pada sijil (dari editor templat khas). */
+export async function updateEventCertificateTitle(
+  eventId: string,
+  certificateTitle: string,
+): Promise<{ error: string } | { ok: true }> {
+  await requireUser();
+  const db = adminClient();
+  const value = certificateTitle.trim() ? certificateTitle : null;
+  const { error } = await db
+    .from("events")
+    .update({ certificate_title: value })
+    .eq("id", eventId);
+  if (error) return { error: error.message };
+  revalidatePath(`/admin/events/${eventId}`);
+  return { ok: true };
 }
 
 export async function updateEventStatus(id: string, status: EventStatus) {

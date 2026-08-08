@@ -10,8 +10,8 @@ Log keputusan dan konteks penting untuk sesi AI akan datang. Tambah entri terbar
   - `templates.owner_event_id` (unique) + `source_template_id`. Senarai induk:
     `owner_event_id IS NULL`. Butang 「Sesuaikan templat untuk program ini」 →
     `customizeEventTemplate` → editor dengan pratonton nama program sebenar (`title`).
-  - UI 「Nama pada sijil」 / `certificate_title` digugurkan — baris panjang diurus dalam
-    templat khas (fon/kotak/Teks Statik). Simpan program mengosongkan `certificate_title` lama.
+  - Susunan baris nama program: `certificate_title`, diedit dalam editor templat khas
+    (textarea 「Nama program pada sijil」 + pratonton kanvas); PDF guna `certificateEventName()`.
   - Teks Statik = `<textarea>` (hormati `\n` melalui `wrapLines`).
 - **SQL**: `2026-08-08-certificate-title.sql` (lajur dikekalkan), `2026-08-08-program-owned-template.sql`.
 
