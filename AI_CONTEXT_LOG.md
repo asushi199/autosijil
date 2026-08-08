@@ -2,16 +2,19 @@
 
 Log keputusan dan konteks penting untuk sesi AI akan datang. Tambah entri terbaru di atas.
 
-## 2026-08-08 — Baris manual nama program & teks statik
+## 2026-08-08 — Templat khas program + baris manual
 
-- **Keperluan**: susun baris nama program pada sijil (banyak program kongsi satu templat);
-  Teks Statik juga perlu sokong Enter / baris kosong untuk ayat panjang ad hoc.
-- **Keputusan**: lajur `events.certificate_title` (nullable). PDF guna
-  `certificateEventName()` — nilai tersuai jika tidak kosong, else `title`. Edit di
-  halaman program (textarea 「Nama pada sijil」 + salin semula). Templat kekal dikongsi.
-  Teks Statik dalam `TemplateEditor` ditukar kepada `<textarea>`; `wrapLines` sudah hormati `\n`.
-- **SQL**: `supabase/migrations/2026-08-08-certificate-title.sql` (+ idempotent dalam
-  `migration.sql`).
+- **Keperluan**: dari edit program, buka editor penuh (fon/kotak/pratonton) untuk salinan
+  khas program; senarai Urus Templat hanya templat induk. Juga baris manual nama program
+  & Teks Statik multiline.
+- **Keputusan**:
+  - `events.certificate_title` + `certificateEventName()`; Teks Statik = `<textarea>`.
+  - `templates.owner_event_id` (unique) + `source_template_id`. Senarai induk:
+    `owner_event_id IS NULL`. Butang 「Sesuaikan templat untuk program ini」 →
+    `customizeEventTemplate` → editor dengan pratonton nilai program sebenar.
+  - Padam program cascade-padam templat khas; padam templat khas pulihkan `template_id`
+    ke induk.
+- **SQL**: `2026-08-08-certificate-title.sql`, `2026-08-08-program-owned-template.sql`.
 
 ## 2026-08-04 — Integrasi eUSTP (cipta event dari tempahan)
 

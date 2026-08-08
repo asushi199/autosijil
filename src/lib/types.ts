@@ -105,7 +105,18 @@ export interface Template {
   bg_image_path: string | null;
   orientation: Orientation;
   elements: TemplateElement[];
+  /** Jika diisi, templat khas program ini — disembunyikan dari senarai induk. */
+  owner_event_id: string | null;
+  /** Templat induk asal apabila ini ialah salinan khas program. */
+  source_template_id: string | null;
   created_at: string;
+}
+
+/** Nilai pratonton dinamik apabila menyunting templat dalam konteks program. */
+export interface TemplatePreviewSamples {
+  event_name: string;
+  event_date: string;
+  event_location: string;
 }
 
 export type EventStatus = "draft" | "open" | "closed" | "released";

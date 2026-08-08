@@ -8,9 +8,11 @@ export const dynamic = "force-dynamic";
 
 export default async function TemplatesPage() {
   const db = adminClient();
+  // Hanya templat induk — templat khas program disembunyikan (strategi A).
   const { data: templates } = await db
     .from("templates")
     .select("*")
+    .is("owner_event_id", null)
     .order("created_at", { ascending: false })
     .returns<Template[]>();
 

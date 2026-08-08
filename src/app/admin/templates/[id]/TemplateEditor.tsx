@@ -17,6 +17,7 @@ import {
   type Orientation,
   type Template,
   type TemplateElement,
+  type TemplatePreviewSamples,
 } from "@/lib/types";
 import { NAME_CONNECTORS, nameForPrint, shrinkSize, wrapLines } from "@/lib/text-layout";
 
@@ -52,11 +53,16 @@ const SAMPLE: Record<Exclude<ElementSource, "static">, string> = {
   participant_slot: "Maklumat peserta",
 };
 
-function previewText(el: TemplateElement): string {
+function previewText(el: TemplateElement, samples?: TemplatePreviewSamples | null): string {
   if (el.source === "static") return el.text || "Teks…";
   if (el.source === "participant_slot") return el.slotLabel || SAMPLE.participant_slot;
   // Nama dipaparkan huruf besar (sama seperti cetakan sijil)
   if (el.source === "name") return nameForPrint(SAMPLE.name);
+  if (samples) {
+    if (el.source === "event_name") return samples.event_name || SAMPLE.event_name;
+    if (el.source === "event_date") return samples.event_date || SAMPLE.event_date;
+    if (el.source === "event_location") return samples.event_location || SAMPLE.event_location;
+  }
   return SAMPLE[el.source];
 }
 
@@ -79,10 +85,28 @@ function measureWidthPx(text: string, family: string, weight: number, sizePx: nu
 
 const fontWeight = (f: FontId) => (f.includes("bold") ? 700 : 400);
 
-export default function TemplateEditor({ template }: { template: Template }) {
+export default function TemplateEditor({
+  template,
+  previewEvent = null,
+}: {
+  template: Template;
+  previewEvent?: {
+    id: string;
+    title: string;
+    samples: TemplatePreviewSamples;
+  } | null;
+}) {
   const router = useRouter();
   const [pending, startTransition] = useTransition();
   const [name, setName] = useState(template.name);
+  const isProgramOwned = !!template.owner_event_id;
+  const backHref = previewEvent
+    ? `/admin/events/${previewEvent.id}/edit`
+    : "/admin/templates";
+  const backLabel = previewEvent ? "← Program" : "← Templat";
+  const previewPdfUrl = previewEvent
+    ? `/api/admin/events/${previewEvent.id}/sample`
+    : `/api/admin/templates/${template.id}/preview`;
   const [orientation, setOrientation] = useState<Orientation>(template.orientation);
   const [elements, setElements] = useState<TemplateElement[]>(() =>
     (template.elements ?? []).map(withElementDefaults),
@@ -254,8 +278,8 @@ export default function TemplateEditor({ template }: { template: Template }) {
 
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div className="flex items-center gap-3">
-          <Link href="/admin/templates" className="text-sm text-blue-700 hover:underline">
-            ← Templat
+          <Link href={backHref} className="text-sm text-blue-700 hover:underline">
+            {backLabel}
           </Link>
           <input
             className="input w-72 font-medium"
@@ -275,7 +299,7 @@ export default function TemplateEditor({ template }: { template: Template }) {
           {dirty && <span className="text-xs text-amber-600">● Belum disimpan</span>}
           <button
             className="btn-secondary"
-            onClick={() => save(() => window.open(`/api/admin/templates/${template.id}/preview`, "_blank"))}
+            onClick={() => save(() => window.open(previewPdfUrl, "_blank"))}
             disabled={pending}
           >
             Pratonton PDF
@@ -285,6 +309,14 @@ export default function TemplateEditor({ template }: { template: Template }) {
           </button>
         </div>
       </div>
+
+      {previewEvent && (
+        <div className="rounded-xl border border-amber-200 bg-amber-50/80 px-3 py-2 text-xs text-amber-950">
+          <b>Templat khas program:</b> {previewEvent.title}. Perubahan fon/kotak di sini hanya untuk
+          program ini. Baris nama program: edit 「Nama pada sijil」 di halaman program, kemudian
+          buka semula editor ini.
+        </div>
+      )}
 
       <div className="grid gap-4 lg:grid-cols-[1fr_320px]">
         {/* Kanvas */}
@@ -315,7 +347,7 @@ export default function TemplateEditor({ template }: { template: Template }) {
 
             {elements.map((el) => {
               const active = el.id === selectedId;
-              const text = previewText(el);
+              const text = previewText(el, previewEvent?.samples);
               const family = FONT_CSS[el.font];
               const weight = fontWeight(el.font);
               const boxPx = clamp(el.boxWidth ?? 0.8, 0.1, 1) * canvasW;
@@ -592,11 +624,15 @@ export default function TemplateEditor({ template }: { template: Template }) {
 
           <section className="card space-y-2">
             <h2 className="text-sm font-medium">Tindakan Templat</h2>
-            <form action={() => duplicateTemplate(template.id)}>
-              <button type="submit" className="btn-secondary w-full">Salin Templat Ini</button>
-            </form>
+            {!isProgramOwned && (
+              <form action={() => duplicateTemplate(template.id)}>
+                <button type="submit" className="btn-secondary w-full">Salin Templat Ini</button>
+              </form>
+            )}
             <form action={() => deleteTemplate(template.id)}>
-              <button type="submit" className="btn-danger w-full">Padam Templat</button>
+              <button type="submit" className="btn-danger w-full">
+                {isProgramOwned ? "Padam templat khas (kembali ke induk)" : "Padam Templat"}
+              </button>
             </form>
           </section>
         </div>

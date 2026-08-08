@@ -5,19 +5,34 @@ import EventEditor from "./EventEditor";
 
 export const dynamic = "force-dynamic";
 
+type TemplateOption = Pick<
+  Template,
+  "id" | "name" | "orientation" | "elements" | "owner_event_id" | "source_template_id"
+>;
+
 export default async function EditEventPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const db = adminClient();
-  const [{ data: event }, { data: templates }] = await Promise.all([
-    db.from("events").select("*").eq("id", id).single<EventRow>(),
-    db.from("templates").select("id, name, orientation, elements").order("created_at", { ascending: false }),
-  ]);
+  const { data: event } = await db.from("events").select("*").eq("id", id).single<EventRow>();
   if (!event) notFound();
 
-  return (
-    <EventEditor
-      event={event}
-      templates={(templates ?? []) as Pick<Template, "id" | "name" | "orientation" | "elements">[]}
-    />
-  );
+  const [{ data: library }, { data: owned }] = await Promise.all([
+    db
+      .from("templates")
+      .select("id, name, orientation, elements, owner_event_id, source_template_id")
+      .is("owner_event_id", null)
+      .order("created_at", { ascending: false }),
+    db
+      .from("templates")
+      .select("id, name, orientation, elements, owner_event_id, source_template_id")
+      .eq("owner_event_id", id)
+      .maybeSingle(),
+  ]);
+
+  const templates: TemplateOption[] = [...((library ?? []) as TemplateOption[])];
+  if (owned) {
+    templates.unshift(owned as TemplateOption);
+  }
+
+  return <EventEditor event={event} templates={templates} />;
 }

@@ -3,10 +3,11 @@
 import { useState, useTransition } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { updateEvent } from "../../../actions";
+import { customizeEventTemplate, updateEvent } from "../../../actions";
 import type { CertificateFieldRole, EventRow, FieldType, FormField, Template } from "@/lib/types";
 import { getTemplateSlots } from "@/lib/certificate-mapping";
 import { normalizeFormFieldsForSave, parseOptionsWhileEditing } from "@/lib/form-fields";
+import { isOwnedByEvent } from "@/lib/program-template";
 
 let counter = 0;
 function newKey() {
@@ -30,7 +31,10 @@ export default function EventEditor({
   templates,
 }: {
   event: EventRow;
-  templates: Pick<Template, "id" | "name" | "orientation" | "elements">[];
+  templates: Pick<
+    Template,
+    "id" | "name" | "orientation" | "elements" | "owner_event_id" | "source_template_id"
+  >[];
 }) {
   const router = useRouter();
   const [pending, startTransition] = useTransition();
@@ -46,6 +50,8 @@ export default function EventEditor({
   const [mappings, setMappings] = useState<Record<string, string>>(event.certificate_field_mappings ?? {});
   const [fields, setFields] = useState<FormField[]>(event.form_fields ?? []);
   const [msg, setMsg] = useState<{ kind: "ok" | "err"; text: string } | null>(null);
+  const selectedTemplate = templates.find((t) => t.id === templateId);
+  const editingOwnedTemplate = !!selectedTemplate && isOwnedByEvent(selectedTemplate, event.id);
 
   function onTitleChange(next: string) {
     setCertificateTitle((current) => (current === title ? next : current));
@@ -76,25 +82,47 @@ export default function EventEditor({
     });
   }
 
+  function payload() {
+    return {
+      title,
+      description: description.trim() || null,
+      event_date: eventDate || null,
+      location: location.trim() || null,
+      form_fields: normalizeFormFieldsForSave(fields),
+      template_id: templateId || null,
+      requires_certificate: requiresCertificate,
+      certificate_field_mappings: mappings,
+      certificate_title: certificateTitle.trim() ? certificateTitle : null,
+    };
+  }
+
   function save() {
     setMsg(null);
     startTransition(async () => {
-      const res = await updateEvent(event.id, {
-        title,
-        description: description.trim() || null,
-        event_date: eventDate || null,
-        location: location.trim() || null,
-        form_fields: normalizeFormFieldsForSave(fields),
-        template_id: templateId || null,
-        requires_certificate: requiresCertificate,
-        certificate_field_mappings: mappings,
-        certificate_title: certificateTitle.trim() ? certificateTitle : null,
-      });
+      const res = await updateEvent(event.id, payload());
       if (res?.error) setMsg({ kind: "err", text: res.error });
       else {
         setMsg({ kind: "ok", text: "Disimpan." });
         router.refresh();
       }
+    });
+  }
+
+  function openProgramTemplate() {
+    setMsg(null);
+    startTransition(async () => {
+      // Simpan dulu supaya 「Nama pada sijil」 muncul dalam pratonton editor.
+      const saved = await updateEvent(event.id, payload());
+      if (saved?.error) {
+        setMsg({ kind: "err", text: saved.error });
+        return;
+      }
+      const res = await customizeEventTemplate(event.id, templateId);
+      if ("error" in res) {
+        setMsg({ kind: "err", text: res.error });
+        return;
+      }
+      router.push(res.url);
     });
   }
 
@@ -138,12 +166,14 @@ export default function EventEditor({
         </div>
         <div>
           <label className="label">Templat sijil</label>
-          <div className="flex gap-2">
-            <select className="input" value={templateId} onChange={(e) => setTemplateId(e.target.value)}>
+          <div className="flex flex-wrap gap-2">
+            <select className="input min-w-0 flex-1" value={templateId} onChange={(e) => setTemplateId(e.target.value)}>
               <option value="">— Belum dipilih —</option>
               {templates.map((t) => (
                 <option key={t.id} value={t.id}>
+                  {isOwnedByEvent(t, event.id) ? "★ " : ""}
                   {t.name} ({t.orientation === "landscape" ? "melintang" : "menegak"})
+                  {isOwnedByEvent(t, event.id) ? " — khas program ini" : ""}
                 </option>
               ))}
             </select>
@@ -151,6 +181,23 @@ export default function EventEditor({
               Urus Templat
             </Link>
           </div>
+          {requiresCertificate && templateId && (
+            <div className="mt-2 flex flex-wrap items-center gap-2">
+              <button
+                type="button"
+                className="btn-primary"
+                disabled={pending}
+                onClick={openProgramTemplate}
+              >
+                {editingOwnedTemplate
+                  ? "Edit templat program ini"
+                  : "Sesuaikan templat untuk program ini"}
+              </button>
+              <p className="text-xs text-gray-500">
+                Buka editor penuh (fon, kotak, pratonton). Salinan khas tidak muncul dalam Urus Templat.
+              </p>
+            </div>
+          )}
         </div>
         {requiresCertificate && (
           <div>
@@ -172,8 +219,8 @@ export default function EventEditor({
               placeholder="Tekan Enter untuk baris baharu pada sijil"
             />
             <p className="mt-1 text-xs text-gray-500">
-              Susun baris di sini (Enter / baris kosong). Templat yang sama boleh dikongsi; setiap
-              program menyimpan teksnya sendiri.
+              Susun baris di sini (Enter / baris kosong), kemudian gunakan 「Sesuaikan templat」
+              untuk lihat fon &amp; sama ada teks melebihi kotak.
             </p>
           </div>
         )}
