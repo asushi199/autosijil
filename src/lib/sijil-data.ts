@@ -3,7 +3,6 @@ import { adminClient } from "./supabase/admin";
 import { formatTarikh, type SijilValues } from "./pdf";
 import type { Attendee, AttendeeData, EventRow, FormField, Template } from "./types";
 import { mappedSlotValues } from "./certificate-mapping";
-import { certificateEventName } from "./certificate-title";
 import { schoolLabelForCode, type SchoolDirectoryEntry } from "./school-directory";
 
 /** Muat program + templat + imej latar untuk penjanaan sijil. */
@@ -51,7 +50,7 @@ export function attendeeValues(
     name: attendee.name_value,
     ic: attendee.ic_value ?? undefined,
     school: typeof schoolValue === "string" ? schoolValue : undefined,
-    eventName: certificateEventName(event),
+    eventName: event.title,
     eventDate: formatTarikh(event.event_date),
     eventLocation: event.location ?? "",
     slots: template ? mappedSlotValues(template, event.certificate_field_mappings ?? {}, displayData) : {},

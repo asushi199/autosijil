@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
 import { adminClient } from "@/lib/supabase/admin";
 import { formatTarikh, generateSijil } from "@/lib/pdf";
-import { certificateEventName } from "@/lib/certificate-title";
 import { loadSijilContext } from "@/lib/sijil-data";
 import type { EventRow } from "@/lib/types";
 
@@ -19,7 +18,7 @@ export async function GET(_req: Request, ctx: { params: Promise<{ id: string }> 
     name: "Ahmad Danial bin Abdullah",
     ic: "900101-08-1234",
     school: schoolField ? "Sekolah Kebangsaan Seri Manjung" : undefined,
-    eventName: certificateEventName(event),
+    eventName: event.title,
     eventDate: formatTarikh(event.event_date),
   });
 

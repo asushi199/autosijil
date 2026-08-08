@@ -54,7 +54,6 @@ export interface UpdateEventPayload {
   template_id: string | null;
   requires_certificate: boolean;
   certificate_field_mappings: Record<string, string>;
-  certificate_title: string | null;
 }
 
 export async function updateEvent(id: string, payload: UpdateEventPayload) {
@@ -65,7 +64,11 @@ export async function updateEvent(id: string, payload: UpdateEventPayload) {
     return { error: "Tetapkan tepat satu medan sebagai 'Nama (dicetak pada sijil)'." };
   }
   const db = adminClient();
-  const { error } = await db.from("events").update(payload).eq("id", id);
+  // Kosongkan certificate_title lama (UI telah diganti dengan templat khas program).
+  const { error } = await db
+    .from("events")
+    .update({ ...payload, certificate_title: null })
+    .eq("id", id);
   if (error) return { error: error.message };
 
   // Buang templat khas program yang tidak lagi dipilih (elak orphan).

@@ -39,9 +39,6 @@ export default function EventEditor({
   const router = useRouter();
   const [pending, startTransition] = useTransition();
   const [title, setTitle] = useState(event.title);
-  const [certificateTitle, setCertificateTitle] = useState(
-    event.certificate_title ?? event.title,
-  );
   const [description, setDescription] = useState(event.description ?? "");
   const [eventDate, setEventDate] = useState(event.event_date ?? "");
   const [location, setLocation] = useState(event.location ?? "");
@@ -52,11 +49,6 @@ export default function EventEditor({
   const [msg, setMsg] = useState<{ kind: "ok" | "err"; text: string } | null>(null);
   const selectedTemplate = templates.find((t) => t.id === templateId);
   const editingOwnedTemplate = !!selectedTemplate && isOwnedByEvent(selectedTemplate, event.id);
-
-  function onTitleChange(next: string) {
-    setCertificateTitle((current) => (current === title ? next : current));
-    setTitle(next);
-  }
 
   function patchField(i: number, patch: Partial<FormField>) {
     setFields((fs) => fs.map((f, j) => (j === i ? { ...f, ...patch } : f)));
@@ -92,7 +84,6 @@ export default function EventEditor({
       template_id: templateId || null,
       requires_certificate: requiresCertificate,
       certificate_field_mappings: mappings,
-      certificate_title: certificateTitle.trim() ? certificateTitle : null,
     };
   }
 
@@ -111,7 +102,7 @@ export default function EventEditor({
   function openProgramTemplate() {
     setMsg(null);
     startTransition(async () => {
-      // Simpan dulu supaya 「Nama pada sijil」 muncul dalam pratonton editor.
+      // Simpan dulu supaya nama program terkini masuk pratonton editor.
       const saved = await updateEvent(event.id, payload());
       if (saved?.error) {
         setMsg({ kind: "err", text: saved.error });
@@ -143,7 +134,7 @@ export default function EventEditor({
         </label>
         <div>
           <label className="label">Nama program *</label>
-          <input className="input" value={title} onChange={(e) => onTitleChange(e.target.value)} required />
+          <input className="input" value={title} onChange={(e) => setTitle(e.target.value)} required />
         </div>
         <div>
           <label className="label">Keterangan (dipaparkan pada borang)</label>
@@ -199,31 +190,6 @@ export default function EventEditor({
             </div>
           )}
         </div>
-        {requiresCertificate && (
-          <div>
-            <div className="mb-1 flex items-center justify-between gap-2">
-              <label className="label mb-0">Nama pada sijil</label>
-              <button
-                type="button"
-                className="text-xs text-blue-700 hover:underline"
-                onClick={() => setCertificateTitle(title)}
-              >
-                Salin semula dari Nama program
-              </button>
-            </div>
-            <textarea
-              className="input font-mono text-sm"
-              rows={4}
-              value={certificateTitle}
-              onChange={(e) => setCertificateTitle(e.target.value)}
-              placeholder="Tekan Enter untuk baris baharu pada sijil"
-            />
-            <p className="mt-1 text-xs text-gray-500">
-              Susun baris di sini (Enter / baris kosong), kemudian gunakan 「Sesuaikan templat」
-              untuk lihat fon &amp; sama ada teks melebihi kotak.
-            </p>
-          </div>
-        )}
       </section>
 
       {requiresCertificate && templateId && (() => {

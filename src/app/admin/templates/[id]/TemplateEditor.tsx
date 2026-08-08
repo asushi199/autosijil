@@ -312,9 +312,8 @@ export default function TemplateEditor({
 
       {previewEvent && (
         <div className="rounded-xl border border-amber-200 bg-amber-50/80 px-3 py-2 text-xs text-amber-950">
-          <b>Templat khas program:</b> {previewEvent.title}. Perubahan fon/kotak di sini hanya untuk
-          program ini. Baris nama program: edit 「Nama pada sijil」 di halaman program, kemudian
-          buka semula editor ini.
+          <b>Templat khas program:</b> {previewEvent.title}. Perubahan fon, kotak dan teks statik di
+          sini hanya untuk program ini — tidak menjejaskan templat induk.
         </div>
       )}
 

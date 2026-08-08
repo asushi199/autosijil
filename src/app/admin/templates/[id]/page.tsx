@@ -1,6 +1,5 @@
 import { notFound } from "next/navigation";
 import { adminClient } from "@/lib/supabase/admin";
-import { certificateEventName } from "@/lib/certificate-title";
 import { formatTarikh } from "@/lib/pdf";
 import type { EventRow, Template, TemplatePreviewSamples } from "@/lib/types";
 import TemplateEditor from "./TemplateEditor";
@@ -31,7 +30,7 @@ export default async function TemplatePage({
       id: event.id,
       title: event.title,
       samples: {
-        event_name: certificateEventName(event),
+        event_name: event.title,
         event_date: formatTarikh(event.event_date),
         event_location: event.location ?? "",
       },

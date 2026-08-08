@@ -14,5 +14,5 @@ Urus Templat hanya memaparkan templat induk (library).
 - Senarai `/admin/templates`: `owner_event_id IS NULL` sahaja.
 - Dropdown program: templat induk + templat khas program semasa (jika ada).
 - Latar disalin (seperti `duplicateTemplate`) supaya padam selamat.
-- `certificate_title` kekal untuk baris manual nama program; editor khas guna nilai program untuk pratonton.
+- Pratonton editor khas guna `event.title` (UI `certificate_title` digugurkan).
 - Padam program → cascade padam templat khas (`ON DELETE CASCADE` pada `owner_event_id`).
