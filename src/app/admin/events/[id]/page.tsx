@@ -40,6 +40,7 @@ export default async function EventDetail({ params }: { params: Promise<{ id: st
           <h1 className="text-xl font-semibold">{event.title}</h1>
           <p className="text-sm text-gray-500">
             {event.event_date ?? "Tarikh belum ditetapkan"}
+            {event.event_end_date && event.event_end_date !== event.event_date ? ` hingga ${event.event_end_date}` : ""}
             {event.location ? ` · ${event.location}` : ""} · Status:{" "}
             <b>{STATUS_LABEL[event.status]}</b>
           </p>

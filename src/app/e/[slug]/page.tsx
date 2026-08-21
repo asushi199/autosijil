@@ -27,7 +27,7 @@ export default async function PublicEventPage({
   const db = adminClient();
   const { data: event } = await db
     .from("events")
-    .select("id, slug, title, description, event_date, location, status, form_fields, requires_certificate")
+    .select("id, slug, title, description, event_date, event_end_date, location, status, form_fields, requires_certificate")
     .eq("slug", slug)
     .single<Omit<EventRow, "template_id" | "created_at">>();
 
@@ -46,7 +46,7 @@ export default async function PublicEventPage({
 
   const meta = (
     <p className="mb-4 text-sm text-gray-500">
-      {event.event_date && <>Tarikh: {event.event_date}</>}
+      {event.event_date && <>Tarikh: {event.event_date}{event.event_end_date && event.event_end_date !== event.event_date ? ` hingga ${event.event_end_date}` : ""}</>}
       {event.location && <> · {event.location}</>}
     </p>
   );

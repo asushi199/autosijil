@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { adminClient } from "@/lib/supabase/admin";
 import { suggestCertificateNames } from "@/lib/certificate-search";
+import { uniqueAttendeesByName } from "@/lib/sijil-data";
 import type { EventRow } from "@/lib/types";
 
 export async function GET(req: NextRequest, ctx: { params: Promise<{ slug: string }> }) {
@@ -20,5 +21,5 @@ export async function GET(req: NextRequest, ctx: { params: Promise<{ slug: strin
     .from("attendees")
     .select("name_value")
     .eq("event_id", event.id);
-  return NextResponse.json({ names: suggestCertificateNames((data ?? []).map((row) => row.name_value), query) });
+  return NextResponse.json({ names: suggestCertificateNames(uniqueAttendeesByName(data ?? []).map((row) => row.name_value), query) });
 }

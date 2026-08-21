@@ -48,16 +48,20 @@ export async function POST(req: NextRequest, ctx: { params: Promise<{ slug: stri
       { status: 404 },
     );
   }
-  if (matches.length > 1) {
-    return NextResponse.json(
-      {
-        error:
-          "Terdapat lebih daripada satu rekod dengan nama yang sama. Sila hubungi urus setia program.",
-      },
-      { status: 409 },
-    );
-  }
-
   const m = matches[0];
+  const { data: sessions } = await db
+    .from("event_sessions")
+    .select("id")
+    .eq("event_id", event.id);
+  if (sessions?.length) {
+    const { data: attendance } = await db
+      .from("session_attendances")
+      .select("id")
+      .eq("attendee_id", m.id)
+      .limit(1);
+    if (!attendance?.length) {
+      return NextResponse.json({ error: "Sila rekodkan kehadiran sekurang-kurangnya satu hari dahulu." }, { status: 403 });
+    }
+  }
   return NextResponse.json({ id: m.id, token: sijilToken(m.id), name: m.name_value });
 }

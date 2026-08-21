@@ -25,6 +25,15 @@ Log keputusan dan konteks penting untuk sesi AI akan datang. Tambah entri terbar
 - **Fasa 2**: `PATCH /api/integrations/eustp/events` kemas kini title/date/location/description
   mengikut `externalBookingId` apabila eUSTP ubah jadual.
 
+## 2026-08-21 — Event eUSTP berbilang sesi
+
+- Integrasi eUSTP kini boleh mencipta satu event dengan beberapa sesi harian
+  dan satu QR. Peserta direkodkan sekali mengikut nama tanpa peka huruf besar/
+  kecil; setiap sesi hanya boleh direkodkan sekali bagi peserta yang sama.
+- Selagi event dibuka, peserta boleh memilih sesi lepas untuk kehadiran lewat.
+  Masa rekod sebenar dan kaedah `self_makeup` disimpan berasingan daripada
+  tarikh sesi. Sijil memerlukan sekurang-kurangnya satu rekod sesi.
+
 ## 2026-07-22 — Auto-skrol hasil semakan sijil pada mudah alih
 
 - **Keperluan pengguna**: apabila peserta menaip nama untuk menyemak sijil, hasil carian tidak boleh terlindung oleh papan kekunci telefon.

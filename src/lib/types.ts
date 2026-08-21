@@ -127,6 +127,7 @@ export interface EventRow {
   title: string;
   description: string | null;
   event_date: string | null;
+  event_end_date?: string | null;
   location: string | null;
   status: EventStatus;
   form_fields: FormField[];
@@ -148,6 +149,13 @@ export interface Attendee {
   name_value: string;
   ic_value: string | null;
   created_at: string;
+}
+
+export interface EventSession {
+  id: string;
+  event_id: string;
+  session_date: string;
+  slot: "am" | "pm" | "full_day";
 }
 
 export const STATUS_LABEL: Record<EventStatus, string> = {

@@ -15,12 +15,25 @@ type CreateBody = {
   externalBookingId?: string;
   title?: string;
   eventDate?: string | null;
+  eventEndDate?: string | null;
+  sessions?: Array<{ date?: string; slot?: "am" | "pm" | "full_day" }>;
   location?: string | null;
   requiresCertificate?: boolean;
   description?: string | null;
   pkgId?: string;
   slot?: string;
 };
+
+function validDate(value: unknown): value is string {
+  return typeof value === "string" && /^\d{4}-\d{2}-\d{2}$/.test(value);
+}
+
+function normaliseSessions(body: CreateBody) {
+  const source = body.sessions ?? (validDate(body.eventDate) ? [{ date: body.eventDate, slot: "full_day" as const }] : []);
+  return source
+    .filter((row) => validDate(row.date) && ["am", "pm", "full_day"].includes(row.slot ?? ""))
+    .map((row) => ({ session_date: row.date!, slot: row.slot! }));
+}
 
 function appBaseUrl() {
   return (process.env.NEXT_PUBLIC_APP_URL ?? "").replace(/\/$/, "");
@@ -57,8 +70,13 @@ export async function POST(req: Request) {
 
   const requiresCertificate = Boolean(body.requiresCertificate);
   const eventDate = body.eventDate ? String(body.eventDate).trim() || null : null;
+  const eventEndDate = body.eventEndDate ? String(body.eventEndDate).trim() || null : eventDate;
   const location = body.location ? String(body.location).trim() || null : null;
   const description = body.description ? String(body.description).trim() || null : null;
+  const sessions = normaliseSessions(body);
+  if (eventDate && !sessions.length) {
+    return NextResponse.json({ error: "Sesi program tidak sah" }, { status: 400 });
+  }
 
   const db = adminClient();
 
@@ -90,6 +108,7 @@ export async function POST(req: Request) {
       title,
       description,
       event_date: eventDate,
+      event_end_date: eventEndDate,
       location,
       status: "open",
       form_fields: DEFAULT_FIELDS,
@@ -124,6 +143,13 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: insertError.message }, { status: 500 });
   }
 
+  if (sessions.length) {
+    const { error: sessionError } = await db
+      .from("event_sessions")
+      .insert(sessions.map((session) => ({ event_id: created.id, ...session })));
+    if (sessionError) return NextResponse.json({ error: sessionError.message }, { status: 500 });
+  }
+
   const links = urlsFor(created.id, created.slug);
   return NextResponse.json({
     eventId: created.id,
@@ -136,7 +162,10 @@ type UpdateBody = {
   externalBookingId?: string;
   title?: string;
   eventDate?: string | null;
+  eventEndDate?: string | null;
+  sessions?: Array<{ date?: string; slot?: "am" | "pm" | "full_day" }>;
   location?: string | null;
+  requiresCertificate?: boolean;
   description?: string | null;
 };
 
@@ -172,7 +201,7 @@ export async function PATCH(req: Request) {
     return NextResponse.json({ error: "Event tidak dijumpai" }, { status: 404 });
   }
 
-  const patch: Record<string, string | null> = {};
+  const patch: Record<string, string | boolean | null> = {};
   if (body.title !== undefined) {
     const title = String(body.title ?? "").trim();
     if (!title) {
@@ -183,11 +212,17 @@ export async function PATCH(req: Request) {
   if (body.eventDate !== undefined) {
     patch.event_date = body.eventDate ? String(body.eventDate).trim() || null : null;
   }
+  if (body.eventEndDate !== undefined) {
+    patch.event_end_date = body.eventEndDate ? String(body.eventEndDate).trim() || null : null;
+  }
   if (body.location !== undefined) {
     patch.location = body.location ? String(body.location).trim() || null : null;
   }
   if (body.description !== undefined) {
     patch.description = body.description ? String(body.description).trim() || null : null;
+  }
+  if (body.requiresCertificate !== undefined) {
+    patch.requires_certificate = body.requiresCertificate;
   }
 
   if (Object.keys(patch).length === 0) {
@@ -197,6 +232,17 @@ export async function PATCH(req: Request) {
   const { error: updateError } = await db.from("events").update(patch).eq("id", existing.id);
   if (updateError) {
     return NextResponse.json({ error: updateError.message }, { status: 500 });
+  }
+
+  if (body.sessions !== undefined) {
+    const sessions = normaliseSessions(body);
+    if (!sessions.length) return NextResponse.json({ error: "Sesi program tidak sah" }, { status: 400 });
+    const { error: deleteError } = await db.from("event_sessions").delete().eq("event_id", existing.id);
+    if (deleteError) return NextResponse.json({ error: deleteError.message }, { status: 500 });
+    const { error: sessionError } = await db
+      .from("event_sessions")
+      .insert(sessions.map((session) => ({ event_id: existing.id, ...session })));
+    if (sessionError) return NextResponse.json({ error: sessionError.message }, { status: 500 });
   }
 
   const links = urlsFor(existing.id, existing.slug);

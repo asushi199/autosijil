@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { adminClient } from "@/lib/supabase/admin";
 import { generateCombinedSijil } from "@/lib/pdf";
-import { attendeeValues, loadSijilContext, safeFilename } from "@/lib/sijil-data";
+import { attendeeValues, loadSijilContext, safeFilename, uniqueAttendeesByName } from "@/lib/sijil-data";
 import type { Attendee, EventRow } from "@/lib/types";
 
 export const maxDuration = 60;
@@ -28,7 +28,7 @@ export async function GET(_req: Request, ctx: { params: Promise<{ id: string }> 
   const pdf = await generateCombinedSijil(
     sijilCtx.template,
     sijilCtx.bgBytes,
-    attendees.map((a) => attendeeValues(event, a, sijilCtx.template, sijilCtx.schools)),
+    uniqueAttendeesByName(attendees).map((a) => attendeeValues(event, a, sijilCtx.template, sijilCtx.schools)),
   );
 
   return new NextResponse(Buffer.from(pdf), {

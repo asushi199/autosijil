@@ -52,7 +52,10 @@ export function attendeeValues(
     ic: attendee.ic_value ?? undefined,
     school: typeof schoolValue === "string" ? schoolValue : undefined,
     eventName: certificateEventName(event),
-    eventDate: formatTarikh(event.event_date),
+    eventDate:
+      event.event_end_date && event.event_end_date !== event.event_date
+        ? `${formatTarikh(event.event_date)} hingga ${formatTarikh(event.event_end_date)}`
+        : formatTarikh(event.event_date),
     eventLocation: event.location ?? "",
     slots: template ? mappedSlotValues(template, event.certificate_field_mappings ?? {}, displayData) : {},
   };
@@ -79,6 +82,17 @@ export function normalizeIc(s: string): string {
  */
 export function normalizeName(s: string): string {
   return s.trim().replace(/\s+/g, " ").toLowerCase();
+}
+
+/** Satu penerima sijil bagi satu nama, tanpa mengira huruf besar/kecil. */
+export function uniqueAttendeesByName<T extends { name_value: string }>(attendees: T[]): T[] {
+  const seen = new Set<string>();
+  return attendees.filter((attendee) => {
+    const key = normalizeName(attendee.name_value);
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
 }
 
 /** Nama fail selamat daripada nama peserta. */
