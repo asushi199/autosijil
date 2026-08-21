@@ -33,6 +33,9 @@ Log keputusan dan konteks penting untuk sesi AI akan datang. Tambah entri terbar
 - Selagi event dibuka, peserta boleh memilih sesi lepas untuk kehadiran lewat.
   Masa rekod sebenar dan kaedah `self_makeup` disimpan berasingan daripada
   tarikh sesi. Sijil memerlukan sekurang-kurangnya satu rekod sesi.
+- Endpoint peribadi `merge-legacy` memindahkan peserta event eUSTP lama ke sesi
+  event baharu sebelum event lama dipadam. Nama dinormalkan tanpa peka huruf
+  besar/kecil supaya sijil kekal satu bagi setiap nama.
 
 ## 2026-07-22 — Auto-skrol hasil semakan sijil pada mudah alih
 
