@@ -6,7 +6,9 @@ This version has breaking changes — APIs, conventions, and file structure may 
 
 # Sistem e-Sijil & Kehadiran — panduan agen
 
-Baca `README.md` untuk gambaran sistem dan `AI_CONTEXT_LOG.md` untuk keputusan reka bentuk.
+Baca `README.md` untuk gambaran sistem, `CODEGRAPH.md` untuk peta fail/aliran
+(baca dahulu sebelum mengimbas seluruh repo), dan `AI_CONTEXT_LOG.md` untuk
+keputusan reka bentuk.
 
 ## Peraturan projek
 
@@ -21,6 +23,8 @@ Baca `README.md` untuk gambaran sistem dan `AI_CONTEXT_LOG.md` untuk keputusan r
   supaya editor (CSS %) dan PDF (points) kekal sepadan.
 - Skema DB: `supabase/migration.sql`. Sebarang perubahan skema mesti dikemas kini dalam fail
   itu (idempotent — `if not exists`).
+- Apabila menambah laluan, jadual, atau aliran utama, kemas kini `CODEGRAPH.md`
+  dalam perubahan yang sama.
 - `src/proxy.ts` ialah pengganti middleware (konvensyen Next 16) — melindungi `/admin` dan
   `/api/admin`.
 
