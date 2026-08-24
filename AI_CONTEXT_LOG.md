@@ -2,6 +2,14 @@
 
 Log keputusan dan konteks penting untuk sesi AI akan datang. Tambah entri terbaru di atas.
 
+## 2026-08-24 — Ringkasan kehadiran mengikut Direktori Sekolah
+
+- Halaman butiran Program kini memaparkan ringkasan sekolah secara automatik apabila borang
+  menggunakan medan `school`: jumlah sekolah sudah/belum hadir, jumlah peserta, carian dan
+  jadual bilangan peserta bagi setiap sekolah.
+- Senarai bermula dengan sekolah belum hadir dan boleh disalin untuk tindakan susulan.
+  Perbandingan menggunakan semua rekod dalam `school_directory`; tiada perubahan skema DB.
+
 ## 2026-08-08 — Templat khas program + Teks Statik multiline
 
 - **Keperluan**: dari edit program, buka editor penuh (fon/kotak/pratonton) untuk salinan

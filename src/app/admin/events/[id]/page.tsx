@@ -7,8 +7,10 @@ import QrPanel from "./QrPanel";
 import StatusControls from "./StatusControls";
 import ImportPanel from "./ImportPanel";
 import AttendeeTable from "./AttendeeTable";
+import SchoolAttendanceSummary from "./SchoolAttendanceSummary";
 import ConfirmSubmit from "../../ConfirmSubmit";
 import { deleteEvent } from "../../actions";
+import { buildSchoolAttendanceRows } from "@/lib/school-attendance";
 
 export const dynamic = "force-dynamic";
 
@@ -32,6 +34,10 @@ export default async function EventDetail({ params }: { params: Promise<{ id: st
   const base = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
   const publicUrl = `${base}/e/${event.slug}`;
   const nameField = fields.find((f) => f.role === "name");
+  const schoolField = fields.find((field) => field.type === "school");
+  const schoolAttendanceRows = schoolField
+    ? buildSchoolAttendanceRows(schools, attendees ?? [], schoolField.key)
+    : [];
 
   return (
     <div className="space-y-5">
@@ -73,6 +79,14 @@ export default async function EventDetail({ params }: { params: Promise<{ id: st
           <StatusControls eventId={id} current={event.status} hasTemplate={!!event.template_id} requiresCertificate={event.requires_certificate ?? true} />
         </section>
       </div>
+
+      {schoolField && (
+        <SchoolAttendanceSummary
+          rows={schoolAttendanceRows}
+          fieldLabel={schoolField.label}
+          totalAttendeeCount={attendees?.length ?? 0}
+        />
+      )}
 
       <section className="card">
         <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
