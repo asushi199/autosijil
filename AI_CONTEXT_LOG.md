@@ -2,6 +2,13 @@
 
 Log keputusan dan konteks penting untuk sesi AI akan datang. Tambah entri terbaru di atas.
 
+## 2026-08-24 — CODEGRAPH.md dikemas kini sebagai peta agen
+
+- `CODEGRAPH.md` kini merangkumi direktori sekolah, ringkasan kehadiran sekolah,
+  templat khas program, eUSTP, `event_sessions` / `session_attendances`.
+- `AGENTS.md` mengarahkan agen baca peta ini dahulu (bukan imbas seluruh repo).
+  Keputusan reka bentuk kekal di log ini; jangan salin semula ke dalam graf.
+
 ## 2026-08-24 — Ringkasan kehadiran mengikut Direktori Sekolah
 
 - Halaman butiran Program kini memaparkan ringkasan sekolah secara automatik apabila borang
