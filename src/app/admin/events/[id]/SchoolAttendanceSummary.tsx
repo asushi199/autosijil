@@ -14,6 +14,7 @@ export default function SchoolAttendanceSummary({
   fieldLabel: string;
   totalAttendeeCount: number;
 }) {
+  const [expanded, setExpanded] = useState(false);
   const [filter, setFilter] = useState<AttendanceFilter>("absent");
   const [query, setQuery] = useState("");
   const [copied, setCopied] = useState(false);
@@ -64,24 +65,53 @@ export default function SchoolAttendanceSummary({
   ];
 
   return (
-    <section className="card space-y-4">
+    <section className="card">
       <div className="flex flex-wrap items-start justify-between gap-3">
-        <div>
-          <h2 className="font-medium">Ringkasan Kehadiran Sekolah</h2>
-          <p className="mt-1 text-xs text-gray-500">
-            Berdasarkan medan <b>{fieldLabel}</b> dan semua sekolah dalam Direktori Sekolah.
-          </p>
-        </div>
         <button
           type="button"
-          className="btn-secondary text-xs"
-          disabled={!absentRows.length}
-          onClick={copyAbsentSchools}
+          aria-expanded={expanded}
+          onClick={() => setExpanded((value) => !value)}
+          className="flex min-w-0 flex-1 items-start gap-2 rounded-lg text-left transition-colors hover:bg-gray-50 -m-2 p-2"
         >
-          {copied ? "Senarai disalin" : "Salin senarai belum hadir"}
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth={2}
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            aria-hidden="true"
+            className={`mt-0.5 h-4 w-4 shrink-0 text-gray-400 transition-transform ${expanded ? "rotate-180" : ""}`}
+          >
+            <path d="M6 9l6 6 6-6" />
+          </svg>
+          <div className="min-w-0">
+            <h2 className="font-medium">Ringkasan Kehadiran Sekolah</h2>
+            <p className="mt-1 text-xs text-gray-500">
+              Berdasarkan medan <b>{fieldLabel}</b> dan semua sekolah dalam Direktori Sekolah.
+            </p>
+            {!expanded && (
+              <p className="mt-2 text-xs text-gray-600">
+                {presentCount} sudah hadir · {absentRows.length} belum hadir · {totalAttendeeCount}{" "}
+                peserta
+              </p>
+            )}
+          </div>
         </button>
+        {expanded && (
+          <button
+            type="button"
+            className="btn-secondary text-xs"
+            disabled={!absentRows.length}
+            onClick={copyAbsentSchools}
+          >
+            {copied ? "Senarai disalin" : "Salin senarai belum hadir"}
+          </button>
+        )}
       </div>
 
+      {expanded && (
+        <div className="mt-4 space-y-4">
       <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
         <div className="rounded-lg border border-emerald-200 bg-emerald-50 p-3">
           <p className="text-xs text-emerald-700">Sekolah sudah hadir</p>
@@ -175,6 +205,8 @@ export default function SchoolAttendanceSummary({
               ))}
             </tbody>
           </table>
+        </div>
+      )}
         </div>
       )}
     </section>
