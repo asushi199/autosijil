@@ -1,7 +1,13 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import type { SchoolAttendanceRow } from "@/lib/school-attendance";
+import {
+  formatPkgAttendanceCopy,
+  groupSchoolAttendanceByPkg,
+  pkgGroupLabel,
+  type SchoolAttendancePkgGroup,
+  type SchoolAttendanceRow,
+} from "@/lib/school-attendance";
 
 type AttendanceFilter = "absent" | "present" | "all";
 
@@ -17,7 +23,7 @@ export default function SchoolAttendanceSummary({
   const [expanded, setExpanded] = useState(false);
   const [filter, setFilter] = useState<AttendanceFilter>("absent");
   const [query, setQuery] = useState("");
-  const [copied, setCopied] = useState(false);
+  const [copiedKey, setCopiedKey] = useState<string | null>(null);
 
   const presentCount = rows.filter((row) => row.attendeeCount > 0).length;
   const absentRows = rows.filter((row) => row.attendeeCount === 0);
@@ -36,7 +42,8 @@ export default function SchoolAttendanceSummary({
         !normalizedQuery ||
         row.code.toLowerCase().includes(normalizedQuery) ||
         row.name.toLowerCase().includes(normalizedQuery) ||
-        row.zone.toLowerCase().includes(normalizedQuery),
+        row.zone.toLowerCase().includes(normalizedQuery) ||
+        pkgGroupLabel(row.zone).toLowerCase().includes(normalizedQuery),
       )
       .sort((a, b) => {
         if (filter === "present" && a.attendeeCount !== b.attendeeCount) {
@@ -46,16 +53,31 @@ export default function SchoolAttendanceSummary({
       });
   }, [filter, query, rows]);
 
-  async function copyAbsentSchools() {
-    const text = absentRows
-      .map((row) => `${row.code} — ${row.name}${row.zone ? ` (${row.zone})` : ""}`)
-      .join("\n");
+  const filteredGroups = useMemo(
+    () => groupSchoolAttendanceByPkg(filteredRows),
+    [filteredRows],
+  );
+
+  const absentGroups = useMemo(
+    () =>
+      groupSchoolAttendanceByPkg(
+        [...absentRows].sort((a, b) => a.code.localeCompare(b.code)),
+      ),
+    [absentRows],
+  );
+
+  async function copyText(key: string, text: string) {
+    if (!text) return;
     try {
       await navigator.clipboard.writeText(text);
-      setCopied(true);
+      setCopiedKey(key);
     } catch {
-      setCopied(false);
+      setCopiedKey(null);
     }
+  }
+
+  function copyGroup(group: SchoolAttendancePkgGroup) {
+    void copyText(group.zone || "lain", formatPkgAttendanceCopy([group]));
   }
 
   const filters: { value: AttendanceFilter; label: string; count: number }[] = [
@@ -88,7 +110,8 @@ export default function SchoolAttendanceSummary({
           <div className="min-w-0">
             <h2 className="font-medium">Ringkasan Kehadiran Sekolah</h2>
             <p className="mt-1 text-xs text-gray-500">
-              Berdasarkan medan <b>{fieldLabel}</b> dan semua sekolah dalam Direktori Sekolah.
+              Berdasarkan medan <b>{fieldLabel}</b> dan semua sekolah dalam Direktori Sekolah,
+              dikumpulkan mengikut PKG.
             </p>
             {!expanded && (
               <p className="mt-2 text-xs text-gray-600">
@@ -103,9 +126,9 @@ export default function SchoolAttendanceSummary({
             type="button"
             className="btn-secondary text-xs"
             disabled={!absentRows.length}
-            onClick={copyAbsentSchools}
+            onClick={() => copyText("all", formatPkgAttendanceCopy(absentGroups))}
           >
-            {copied ? "Senarai disalin" : "Salin senarai belum hadir"}
+            {copiedKey === "all" ? "Semua PKG disalin" : "Salin semua PKG belum hadir"}
           </button>
         )}
       </div>
@@ -158,12 +181,12 @@ export default function SchoolAttendanceSummary({
 
       <input
         className="input"
-        placeholder="Cari kod, nama sekolah atau zon…"
+        placeholder="Cari kod, nama sekolah atau PKG…"
         value={query}
         onChange={(event) => setQuery(event.target.value)}
       />
 
-      {!filteredRows.length ? (
+      {!filteredGroups.length ? (
         <p className="py-5 text-center text-sm text-gray-500">
           {!rows.length
             ? "Direktori Sekolah belum mempunyai rekod."
@@ -172,39 +195,63 @@ export default function SchoolAttendanceSummary({
             : "Tiada sekolah sepadan dengan carian."}
         </p>
       ) : (
-        <div className="overflow-x-auto">
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="border-b border-gray-200 text-left text-gray-500">
-                <th className="px-3 py-2 font-medium">Kod</th>
-                <th className="px-3 py-2 font-medium">Nama Sekolah</th>
-                <th className="px-3 py-2 font-medium">Zon</th>
-                <th className="px-3 py-2 font-medium">Status</th>
-                <th className="px-3 py-2 text-right font-medium">Bil. Hadir</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filteredRows.map((row) => (
-                <tr key={row.code} className="border-b border-gray-100 last:border-0">
-                  <td className="whitespace-nowrap px-3 py-2 font-medium">{row.code}</td>
-                  <td className="min-w-56 px-3 py-2">{row.name}</td>
-                  <td className="whitespace-nowrap px-3 py-2 text-gray-600">{row.zone || "—"}</td>
-                  <td className="whitespace-nowrap px-3 py-2">
-                    <span
-                      className={`inline-flex rounded-full px-2 py-1 text-xs font-medium ${
-                        row.attendeeCount > 0
-                          ? "bg-emerald-100 text-emerald-800"
-                          : "bg-amber-100 text-amber-800"
-                      }`}
-                    >
-                      {row.attendeeCount > 0 ? "Sudah hadir" : "Belum hadir"}
-                    </span>
-                  </td>
-                  <td className="px-3 py-2 text-right font-semibold">{row.attendeeCount}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+        <div className="space-y-4">
+          {filteredGroups.map((group) => {
+            const absentInGroup = group.rows.filter((row) => row.attendeeCount === 0).length;
+            return (
+              <div key={group.zone || "lain"} className="overflow-hidden rounded-lg border border-gray-200">
+                <div className="flex flex-wrap items-center justify-between gap-2 bg-gray-50 px-3 py-2">
+                  <div className="min-w-0">
+                    <h3 className="text-sm font-semibold text-gray-900">{group.label}</h3>
+                    <p className="text-xs text-gray-500">
+                      {group.rows.length} sekolah
+                      {filter !== "present" ? ` · ${absentInGroup} belum hadir` : ""}
+                    </p>
+                  </div>
+                  <button
+                    type="button"
+                    className="btn-secondary text-xs"
+                    disabled={!group.rows.length}
+                    onClick={() => copyGroup(group)}
+                  >
+                    {copiedKey === (group.zone || "lain") ? "Disalin" : "Salin senarai PKG ini"}
+                  </button>
+                </div>
+                <div className="overflow-x-auto">
+                  <table className="w-full text-sm">
+                    <thead>
+                      <tr className="border-b border-gray-200 text-left text-gray-500">
+                        <th className="px-3 py-2 font-medium">Kod</th>
+                        <th className="px-3 py-2 font-medium">Nama Sekolah</th>
+                        <th className="px-3 py-2 font-medium">Status</th>
+                        <th className="px-3 py-2 text-right font-medium">Bil. Hadir</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {group.rows.map((row) => (
+                        <tr key={row.code} className="border-b border-gray-100 last:border-0">
+                          <td className="whitespace-nowrap px-3 py-2 font-medium">{row.code}</td>
+                          <td className="min-w-56 px-3 py-2">{row.name}</td>
+                          <td className="whitespace-nowrap px-3 py-2">
+                            <span
+                              className={`inline-flex rounded-full px-2 py-1 text-xs font-medium ${
+                                row.attendeeCount > 0
+                                  ? "bg-emerald-100 text-emerald-800"
+                                  : "bg-amber-100 text-amber-800"
+                              }`}
+                            >
+                              {row.attendeeCount > 0 ? "Sudah hadir" : "Belum hadir"}
+                            </span>
+                          </td>
+                          <td className="px-3 py-2 text-right font-semibold">{row.attendeeCount}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            );
+          })}
         </div>
       )}
         </div>

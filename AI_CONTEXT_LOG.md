@@ -2,6 +2,14 @@
 
 Log keputusan dan konteks penting untuk sesi AI akan datang. Tambah entri terbaru di atas.
 
+## 2026-08-26 — Ringkasan kehadiran dikumpulkan mengikut PKG
+
+- Senarai Ringkasan Kehadiran Sekolah dikumpulkan mengikut `school_directory.zone`
+  (PKG). Tajuk dipaparkan sebagai `PKG Sitiawan`, kemudian senarai sekolah.
+- Setiap kumpulan ada butang salin sendiri supaya urus setia boleh trigger PKG
+  berasingan. Salinan global kekal, juga disusun mengikut PKG.
+- Tiada perubahan skema; zon kosong dikumpulkan sebagai `PKG lain`.
+
 ## 2026-08-24 — CODEGRAPH.md dikemas kini sebagai peta agen
 
 - `CODEGRAPH.md` kini merangkumi direktori sekolah, ringkasan kehadiran sekolah,
