@@ -58,12 +58,18 @@ export default function SchoolAttendanceSummary({
     [filteredRows],
   );
 
-  const absentGroups = useMemo(
+  const copyAllGroups = useMemo(
     () =>
       groupSchoolAttendanceByPkg(
-        [...absentRows].sort((a, b) => a.code.localeCompare(b.code)),
+        rows
+          .filter((row) => {
+            if (filter === "present") return row.attendeeCount > 0;
+            if (filter === "absent") return row.attendeeCount === 0;
+            return true;
+          })
+          .sort((a, b) => a.code.localeCompare(b.code)),
       ),
-    [absentRows],
+    [filter, rows],
   );
 
   async function copyText(key: string, text: string) {
@@ -121,16 +127,14 @@ export default function SchoolAttendanceSummary({
             )}
           </div>
         </button>
-        {expanded && (
-          <button
-            type="button"
-            className="btn-secondary text-xs"
-            disabled={!absentRows.length}
-            onClick={() => copyText("all", formatPkgAttendanceCopy(absentGroups))}
-          >
-            {copiedKey === "all" ? "Semua PKG disalin" : "Salin semua PKG belum hadir"}
-          </button>
-        )}
+        <button
+          type="button"
+          className="btn-primary text-xs"
+          disabled={!copyAllGroups.some((group) => group.rows.length > 0)}
+          onClick={() => copyText("all", formatPkgAttendanceCopy(copyAllGroups))}
+        >
+          {copiedKey === "all" ? "Semua disalin" : "Salin semua"}
+        </button>
       </div>
 
       {expanded && (
