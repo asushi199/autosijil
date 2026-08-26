@@ -127,7 +127,7 @@ flowchart TB
 | --- | --- |
 | Borang kehadiran awam | `src/app/e/[slug]/AttendanceForm.tsx`, `SchoolPicker.tsx`, `src/lib/form-submission.ts` |
 | Direktori sekolah | `src/lib/school-directory.ts`, `src/lib/school-picker.ts`, `scripts/import-school-directory.mjs` |
-| Semak kehadiran sekolah (admin) | `src/lib/school-attendance.ts`, `src/app/admin/events/[id]/SchoolAttendanceSummary.tsx` |
+| Semak kehadiran sekolah (admin) | `src/lib/school-attendance.ts`, `src/app/admin/events/[id]/SchoolAttendanceSummary.tsx` (kumpulan mengikut PKG / zon) |
 | Carian / muat turun sijil | `SemakSijil.tsx`, `src/lib/certificate-search.ts`, `src/app/api/e/[slug]/cadangan\|semak\|sijil` |
 | Jana PDF | `src/lib/pdf.ts`, `src/lib/sijil-data.ts`, `src/lib/text-layout.ts` |
 | Templat khas program | `src/lib/program-template.ts`, `src/lib/certificate-title.ts`, `TemplateEditor.tsx` |
@@ -138,7 +138,7 @@ flowchart TB
 ## Sempadan tanggungjawab
 
 - **Awam**: peserta merekod kehadiran (termasuk sesi eUSTP / kehadiran lewat) dan muat turun sijil melalui pautan program. Cadangan nama (`cadangan`) hanya aktif bila status `released`.
-- **Pentadbir**: `/admin` dan `/api/admin` dilindungi `proxy.ts`. Mutasi dalam `admin/actions.ts`. Medan borang `type === "school"` memaparkan ringkasan kehadiran sekolah pada halaman program.
+- **Pentadbir**: `/admin` dan `/api/admin` dilindungi `proxy.ts`. Mutasi dalam `admin/actions.ts`. Medan borang `type === "school"` memaparkan ringkasan kehadiran sekolah pada halaman program, dikumpulkan mengikut PKG (zon).
 - **eUSTP**: API peribadi (bukan kuki admin). Event idempotent pada `(external_source, external_booking_id)`. Sesi harian dalam `event_sessions`; kehadiran sesi dalam `session_attendances`.
 - **Templat**: senarai Urus Templat = induk (`owner_event_id IS NULL`). Salinan khas program: `owner_event_id` + `source_template_id`. PDF on-demand; jangan simpan fail PDF.
 - **Data**: hanya `adminClient()` (service role, pelayan sahaja) menyentuh Supabase. Jenis medan `school` simpan kod; label `KOD — NAMA` diselesaikan dari `school_directory`.
