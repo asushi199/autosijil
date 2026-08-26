@@ -33,3 +33,20 @@ keputusan reka bentuk.
 - `npm run dev` — pelayan pembangunan (perlukan `.env.local` dengan kunci Supabase)
 - `npm run build` — semakan jenis + binaan penuh
 - `npm run lint` — ESLint
+- `npm test` — ujian unit (Vitest)
+
+## Cursor Cloud specific instructions
+
+- Persekitaran Cloud Agent ditakrifkan dalam `.cursor/environment.json`:
+  - `install` → `.cursor/install.sh` (pakej sistem, Supabase CLI, `npm ci`, pra-tarik imej Docker).
+  - `start` → `.cursor/start.sh` (mulakan Docker + Supabase, guna `supabase/migration.sql`, tulis `.env.local`).
+  - terminal `next-dev` menjalankan `npm run dev` pada port 3000.
+- Supabase dijalankan **secara tempatan** melalui Supabase CLI (Docker) — bukan projek hos.
+  API: `http://127.0.0.1:54321`, Studio: `http://127.0.0.1:54323`, DB: port 54322.
+  Workspace CLI berada di `~/supabase-local` (bukan dalam repo).
+- Nota nested-Docker: `.cursor/docker-up.sh` guna pemacu storan `fuse-overlayfs` dan menetapkan
+  `net.bridge.bridge-nf-call-iptables=0` supaya kontena Supabase boleh berkomunikasi.
+- Log masuk admin dev: `ADMIN_PASSWORD=admin123`. `.env.local` guna kunci demo tempatan Supabase
+  (selamat untuk dev sahaja) dan tidak di-commit.
+- Untuk uji hujung-ke-hujung: cipta Program (`/admin`), buka kehadiran, rekod peserta di
+  `/e/<slug>`, tukar status ke *Sijil Dibuka*, kemudian muat turun sijil PDF di pautan yang sama.

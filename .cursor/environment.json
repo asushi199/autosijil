@@ -1,0 +1,13 @@
+{
+  "name": "e-Sijil & Kehadiran",
+  "user": "ubuntu",
+  "install": "bash .cursor/install.sh",
+  "start": "bash .cursor/start.sh",
+  "terminals": [
+    {
+      "name": "next-dev",
+      "command": "bash .cursor/start.sh && npm run dev"
+    }
+  ],
+  "ports": [3000, 54321, 54323]
+}
