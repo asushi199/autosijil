@@ -33,3 +33,10 @@ keputusan reka bentuk.
 - `npm run dev` — pelayan pembangunan (perlukan `.env.local` dengan kunci Supabase)
 - `npm run build` — semakan jenis + binaan penuh
 - `npm run lint` — ESLint
+
+## CodeGraph
+
+- Projek ini menggunakan indeks setempat `.codegraph/` di akar repositori.
+- Untuk memahami atau mencari kod, rantaian panggilan dan kesan perubahan, gunakan MCP `codegraph_explore` terlebih dahulu; jika MCP tidak tersedia, gunakan `codegraph explore "<soalan atau simbol>"`.
+- `codegraph serve --mcp` menyegerakkan perubahan fail secara automatik. Selepas perubahan struktur, jalankan `codegraph status`; gunakan `codegraph sync` hanya apabila pemantau fail tidak tersedia atau status menunjukkan indeks belum dikemas kini.
+- Jangan sunting pangkalan data `.codegraph` secara manual dan jangan gunakan nama alat MCP lama `mcp__codegraph__index_project`.
