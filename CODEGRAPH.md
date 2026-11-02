@@ -131,6 +131,7 @@ flowchart TB
 | Carian / muat turun sijil | `SemakSijil.tsx`, `src/lib/certificate-search.ts`, `src/app/api/e/[slug]/cadangan\|semak\|sijil` |
 | Jana PDF | `src/lib/pdf.ts`, `src/lib/sijil-data.ts`, `src/lib/text-layout.ts` |
 | Templat khas program | `src/lib/program-template.ts`, `src/lib/certificate-title.ts`, `TemplateEditor.tsx` |
+| Paparan masa (waktu Malaysia GMT+8) | `src/lib/datetime.ts` — `formatMalaysiaDateTime`, digunakan oleh `AttendeeTable.tsx` dan eksport CSV |
 | CRUD admin | `src/app/admin/actions.ts` |
 | eUSTP | `src/lib/integration-auth.ts`, `src/app/api/integrations/eustp/events/` |
 | Skema DB | `supabase/migration.sql` (idempotent) |

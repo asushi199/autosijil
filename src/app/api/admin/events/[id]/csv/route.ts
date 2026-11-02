@@ -3,6 +3,7 @@ import { adminClient } from "@/lib/supabase/admin";
 import { safeFilename } from "@/lib/sijil-data";
 import { formatFieldValue, type SchoolDirectoryEntry } from "@/lib/school-directory";
 import type { Attendee, EventRow } from "@/lib/types";
+import { formatMalaysiaDateTime } from "@/lib/datetime";
 
 function csvCell(s: string): string {
   return /[",\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
@@ -29,7 +30,7 @@ export async function GET(_req: Request, ctx: { params: Promise<{ id: string }> 
   const rows = (attendees ?? []).map((a, i) => [
     String(i + 1),
     ...fields.map((f) => formatFieldValue(f, a.data?.[f.key], schools)),
-    new Date(a.created_at).toLocaleString("ms-MY"),
+    formatMalaysiaDateTime(a.created_at),
   ]);
   // ﻿ (BOM) supaya Excel membuka fail sebagai UTF-8
   const csv =

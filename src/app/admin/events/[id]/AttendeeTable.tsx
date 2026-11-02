@@ -3,6 +3,7 @@
 import { useMemo, useState, useTransition } from "react";
 import type { Attendee, FormField } from "@/lib/types";
 import type { SchoolDirectoryEntry } from "@/lib/school-directory";
+import { formatMalaysiaDateTime } from "@/lib/datetime";
 import { deleteAttendee, updateAttendeeName } from "../../actions";
 import { formatFieldValue } from "@/lib/school-directory";
 
@@ -119,7 +120,7 @@ export default function AttendeeTable({
                       </td>
                     ))}
                     <td className="px-3 py-2 whitespace-nowrap text-gray-500">
-                      {new Date(a.created_at).toLocaleString("ms-MY")}
+                      {formatMalaysiaDateTime(a.created_at)}
                     </td>
                     <td className="px-3 py-2 text-right whitespace-nowrap">
                       {isEditing ? (
